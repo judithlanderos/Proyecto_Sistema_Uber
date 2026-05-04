@@ -24,6 +24,7 @@ app.use(session({
 }));
 
 app.use('/api/auth', rutas);
+app.use('/api', rutas);
 
 app.get('/', (req, res) => {
     res.json({ mensaje: 'Backend SistemaUber funcionando' });

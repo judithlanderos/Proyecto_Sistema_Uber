@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref,computed, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import Viajes from './modulos/Viajes.vue'
 import Usuarios from './modulos/Usuarios.vue'
@@ -56,7 +56,7 @@ import Calificaciones from './modulos/Calificaciones.vue'
 
 const router = useRouter()
 const usuario = ref(JSON.parse(localStorage.getItem('usuario')))
-const moduloActivo = ref(Viajes)
+const moduloActivo = ref(markRaw(Viajes))
 
 const menu = [
     { nombre: 'Usuarios',       componente: Usuarios,       icono: 'fas fa-users' },
