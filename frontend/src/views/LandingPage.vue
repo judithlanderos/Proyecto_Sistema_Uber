@@ -69,7 +69,7 @@
 
         <!-- FOOTER -->
         <footer class="footer">
-            <p>SistemaUber &copy; 2024 — Proyecto Escolar</p>
+            <p>SistemaUber &copy; 2026 — Proyecto </p>
         </footer>
 
     </div>
