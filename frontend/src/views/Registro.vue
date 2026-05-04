@@ -6,32 +6,69 @@
 
             <div class="campo">
                 <label>Nombre</label>
-                <input v-model="form.nombre" type="text" placeholder="Tu nombre" />
+                <input
+                    v-model="form.nombre"
+                    type="text"
+                    placeholder="Tu nombre"
+                    @input="validarNombre"
+                />
+                <span class="error-campo" v-if="errores.nombre">{{ errores.nombre }}</span>
             </div>
 
             <div class="campo">
                 <label>Primer Apellido</label>
-                <input v-model="form.primer_ap" type="text" placeholder="Primer apellido" />
+                <input
+                    v-model="form.primer_ap"
+                    type="text"
+                    placeholder="Primer apellido"
+                    @input="validarPrimerAp"
+                />
+                <span class="error-campo" v-if="errores.primer_ap">{{ errores.primer_ap }}</span>
             </div>
 
             <div class="campo">
                 <label>Segundo Apellido</label>
-                <input v-model="form.segundo_ap" type="text" placeholder="Segundo apellido (opcional)" />
+                <input
+                    v-model="form.segundo_ap"
+                    type="text"
+                    placeholder="Segundo apellido (opcional)"
+                    @input="validarSegundoAp"
+                />
+                <span class="error-campo" v-if="errores.segundo_ap">{{ errores.segundo_ap }}</span>
             </div>
 
             <div class="campo">
                 <label>Correo</label>
-                <input v-model="form.correo" type="email" placeholder="correo@ejemplo.com" />
+                <input
+                    v-model="form.correo"
+                    type="text"
+                    placeholder="correo@ejemplo.com"
+                    @input="validarCorreo"
+                />
+                <span class="error-campo" v-if="errores.correo">{{ errores.correo }}</span>
             </div>
 
             <div class="campo">
                 <label>Telefono</label>
-                <input v-model="form.telefono" type="text" placeholder="Tu telefono" />
+                <input
+                    v-model="form.telefono"
+                    type="text"
+                    placeholder="10 digitos"
+                    @input="validarTelefono"
+                    maxlength="10"
+                />
+                <span class="error-campo" v-if="errores.telefono">{{ errores.telefono }}</span>
             </div>
 
             <div class="campo">
                 <label>Contrasena</label>
-                <input v-model="form.password" type="password" placeholder="Tu contrasena" />
+                <input
+                    v-model="form.password"
+                    type="password"
+                    placeholder="Minimo 6 caracteres"
+                    @input="validarPassword"
+                />
+                <span class="error-campo" v-if="errores.password">{{ errores.password }}</span>
             </div>
 
             <p v-if="error" class="error">{{ error }}</p>
@@ -65,20 +102,108 @@ const form = ref({
     password: ''
 })
 
+const errores = ref({
+    nombre: '',
+    primer_ap: '',
+    segundo_ap: '',
+    correo: '',
+    telefono: '',
+    password: ''
+})
+
+const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/
+
+const validarNombre = () => {
+    if (!form.value.nombre) {
+        errores.value.nombre = 'El nombre es obligatorio'
+    } else if (!soloLetras.test(form.value.nombre)) {
+        errores.value.nombre = 'Solo se permiten letras'
+    } else if (form.value.nombre.length < 2) {
+        errores.value.nombre = 'Minimo 2 caracteres'
+    } else {
+        errores.value.nombre = ''
+    }
+}
+
+const validarPrimerAp = () => {
+    if (!form.value.primer_ap) {
+        errores.value.primer_ap = 'El primer apellido es obligatorio'
+    } else if (!soloLetras.test(form.value.primer_ap)) {
+        errores.value.primer_ap = 'Solo se permiten letras'
+    } else {
+        errores.value.primer_ap = ''
+    }
+}
+
+const validarSegundoAp = () => {
+    if (form.value.segundo_ap && !soloLetras.test(form.value.segundo_ap)) {
+        errores.value.segundo_ap = 'Solo se permiten letras'
+    } else {
+        errores.value.segundo_ap = ''
+    }
+}
+
+const validarCorreo = () => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!form.value.correo) {
+        errores.value.correo = 'El correo es obligatorio'
+    } else if (!regex.test(form.value.correo)) {
+        errores.value.correo = 'Formato invalido, ejemplo: correo@gmail.com'
+    } else {
+        errores.value.correo = ''
+    }
+}
+
+const validarTelefono = () => {
+    const soloNumeros = /^[0-9]*$/
+    if (!form.value.telefono) {
+        errores.value.telefono = 'El telefono es obligatorio'
+    } else if (!soloNumeros.test(form.value.telefono)) {
+        errores.value.telefono = 'Solo se permiten numeros'
+        form.value.telefono = form.value.telefono.replace(/[^0-9]/g, '')
+    } else if (form.value.telefono.length < 10) {
+        errores.value.telefono = 'El telefono debe tener 10 digitos'
+    } else {
+        errores.value.telefono = ''
+    }
+}
+
+const validarPassword = () => {
+    if (!form.value.password) {
+        errores.value.password = 'La contrasena es obligatoria'
+    } else if (form.value.password.length < 6) {
+        errores.value.password = 'Minimo 6 caracteres'
+    } else {
+        errores.value.password = ''
+    }
+}
+
+const formularioValido = () => {
+    validarNombre()
+    validarPrimerAp()
+    validarSegundoAp()
+    validarCorreo()
+    validarTelefono()
+    validarPassword()
+
+    return !errores.value.nombre &&
+           !errores.value.primer_ap &&
+           !errores.value.segundo_ap &&
+           !errores.value.correo &&
+           !errores.value.telefono &&
+           !errores.value.password
+}
+
 const registrar = async () => {
     error.value = ''
     exito.value = ''
 
-    if (!form.value.nombre || !form.value.primer_ap || !form.value.correo || !form.value.telefono || !form.value.password) {
-        error.value = 'Todos los campos obligatorios deben llenarse'
-        return
-    }
+    if (!formularioValido()) return
 
     try {
         await axios.post('http://localhost:3000/api/auth/registro', form.value)
         exito.value = 'Cuenta creada correctamente'
         setTimeout(() => router.push('/login'), 1500)
-
     } catch (err) {
         error.value = err.response?.data?.error || 'Error al registrar'
     }
@@ -145,6 +270,13 @@ const registrar = async () => {
 
 .campo input:focus {
     border-color: #4ade80;
+}
+
+.error-campo {
+    color: #f87171;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
 }
 
 .boton {

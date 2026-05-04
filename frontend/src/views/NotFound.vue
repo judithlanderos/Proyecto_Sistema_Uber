@@ -1,6 +1,6 @@
 <template>
     <div class="contenedor">
-        <h1 class="codigo">404</h1>
+        <h1 class="codigo">UPS!!!! ERROR 404</h1>
         <p class="mensaje">Pagina no encontrada</p>
         <router-link to="/login" class="boton">Regresar al inicio</router-link>
     </div>
