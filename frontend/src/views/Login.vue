@@ -10,7 +10,9 @@
                     v-model="correo"
                     type="email"
                     placeholder="correo@ejemplo.com"
+                    @input="errores.correo = validarCorreo(correo)"
                 />
+                <span class="error-campo" v-if="errores.correo">{{ errores.correo }}</span>
             </div>
 
             <div class="campo">
@@ -19,12 +21,16 @@
                     v-model="password"
                     type="password"
                     placeholder="Tu contrasena"
+                    @input="errores.password = validarPassword(password)"
                 />
+                <span class="error-campo" v-if="errores.password">{{ errores.password }}</span>
             </div>
 
-            <p v-if="error" class="error">{{ error }}</p>
+            <p v-if="errorGeneral" class="error-general">{{ errorGeneral }}</p>
 
-            <button @click="iniciarSesion" class="boton">Iniciar Sesion</button>
+            <button @click="iniciarSesion" class="boton" :disabled="cargando">
+                {{ cargando ? 'Ingresando...' : 'Iniciar Sesion' }}
+            </button>
 
             <p class="enlace">
                 No tienes cuenta?
@@ -37,33 +43,38 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { loginService } from '../services/authService'
+import { validarCorreo, validarPassword } from '../utils/validaciones'
 
+const router = useRouter()
 const correo = ref('')
 const password = ref('')
-const error = ref('')
-const router = useRouter()
+const errorGeneral = ref('')
+const cargando = ref(false)
+
+const errores = ref({
+    correo: '',
+    password: ''
+})
 
 const iniciarSesion = async () => {
-    error.value = ''
+    errores.value.correo = validarCorreo(correo.value)
+    errores.value.password = validarPassword(password.value)
 
-    if (!correo.value || !password.value) {
-        error.value = 'Todos los campos son obligatorios'
-        return
-    }
+    if (errores.value.correo || errores.value.password) return
+
+    cargando.value = true
+    errorGeneral.value = ''
 
     try {
-        const respuesta = await axios.post('http://localhost:3000/api/auth/login', {
-            correo: correo.value,
-            password: password.value
-        })
-
-        localStorage.setItem('token', respuesta.data.token)
-        localStorage.setItem('usuario', JSON.stringify(respuesta.data.usuario))
+        const res = await loginService(correo.value, password.value)
+        localStorage.setItem('token', res.data.token)
+        localStorage.setItem('usuario', JSON.stringify(res.data.usuario))
         router.push('/dashboard')
-
     } catch (err) {
-        error.value = err.response?.data?.error || 'Error al iniciar sesion'
+        errorGeneral.value = err.response?.data?.error || 'Error al iniciar sesion'
+    } finally {
+        cargando.value = false
     }
 }
 </script>
@@ -75,6 +86,7 @@ const iniciarSesion = async () => {
     justify-content: center;
     align-items: center;
     background-color: #0a0a0a;
+    padding: 20px;
 }
 
 .tarjeta {
@@ -83,7 +95,7 @@ const iniciarSesion = async () => {
     border-radius: 12px;
     padding: 40px;
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
@@ -123,10 +135,25 @@ const iniciarSesion = async () => {
     font-size: 15px;
     outline: none;
     transition: border 0.3s;
+    box-sizing: border-box;
 }
 
 .campo input:focus {
     border-color: #4ade80;
+}
+
+.error-campo {
+    color: #f87171;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+.error-general {
+    color: #f87171;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 .boton {
@@ -143,16 +170,8 @@ const iniciarSesion = async () => {
     transition: background-color 0.3s;
 }
 
-.boton:hover {
-    background-color: #22c55e;
-}
-
-.error {
-    color: #f87171;
-    font-size: 13px;
-    margin-bottom: 10px;
-    text-align: center;
-}
+.boton:hover { background-color: #22c55e; }
+.boton:disabled { background-color: #2a2a2a; color: #a0a0a0; cursor: not-allowed; }
 
 .enlace {
     text-align: center;
@@ -167,7 +186,13 @@ const iniciarSesion = async () => {
     font-weight: 500;
 }
 
-.enlace a:hover {
-    text-decoration: underline;
+.enlace a:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+    .tarjeta {
+        padding: 24px 16px;
+    }
+    .titulo { font-size: 20px; }
+    .subtitulo { font-size: 16px; }
 }
 </style>
