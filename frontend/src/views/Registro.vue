@@ -138,7 +138,10 @@ const registrar = async () => {
     try {
         await registroService(form.value)
         exito.value = 'Cuenta creada correctamente'
-        setTimeout(() => router.push('/login'), 1500)
+        const res = await loginService(form.value.correo, form.value.password)
+        localStorage.setItem('token', res.data.token)
+        localStorage.setItem('usuario', JSON.stringify(res.data.usuario))
+        setTimeout(() => router.push('/dashboard'), 1500)
     } catch (err) {
         errorGeneral.value = err.response?.data?.error || 'Error al registrar'
     } finally {
