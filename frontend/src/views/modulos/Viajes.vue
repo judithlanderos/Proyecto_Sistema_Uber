@@ -179,23 +179,32 @@ const errores = ref({
     fecha_solicitud: ''
 })
 
-const token = () => localStorage.getItem('token')
-const headers = () => ({ Authorization: `Bearer ${token()}` })
-
+const getHeaders = () => {
+    const token = localStorage.getItem('token')
+    return { Authorization: `Bearer ${token}` }
+}
 const cargarViajes = async () => {
-    const res = await axios.get('http://localhost:3000/api/viajes', { headers: headers() })
-    viajes.value = res.data
+    try {
+        const res = await axios.get('http://localhost:3000/api/viajes', { headers: getHeaders() })
+        viajes.value = res.data
+    } catch (err) {
+        console.error('Error cargando viajes', err)
+    }
 }
 
 const cargarDesplegables = async () => {
-    const [u, c, v] = await Promise.all([
-        axios.get('http://localhost:3000/api/usuarios', { headers: headers() }),
-        axios.get('http://localhost:3000/api/conductores', { headers: headers() }),
-        axios.get('http://localhost:3000/api/vehiculos', { headers: headers() })
-    ])
-    usuarios.value = u.data
-    conductores.value = c.data
-    vehiculos.value = v.data
+    try {
+        const [u, c, v] = await Promise.all([
+            axios.get('http://localhost:3000/api/usuarios', { headers: getHeaders() }),
+            axios.get('http://localhost:3000/api/conductores', { headers: getHeaders() }),
+            axios.get('http://localhost:3000/api/vehiculos', { headers: getHeaders() })
+        ])
+        usuarios.value = u.data
+        conductores.value = c.data
+        vehiculos.value = v.data
+    } catch (err) {
+        console.error('Error cargando desplegables', err)
+    }
 }
 
 const validarOrigen = () => {

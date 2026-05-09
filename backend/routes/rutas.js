@@ -24,7 +24,7 @@ router.get('/dashboard/conteos', verificarToken, (req, res) => {
     })
 })
 
-// VIAJES - consulta multitabla
+//viajes
 router.get('/viajes', verificarToken, (req, res) => {
     const sql = `
         SELECT 
@@ -36,7 +36,7 @@ router.get('/viajes', verificarToken, (req, res) => {
             v.destino,
             v.estado,
             v.monto_cobrado,
-            v.fecha_solicitud
+            v.fecha_salida
         FROM Viaje v
         JOIN Usuario u ON v.Usuario_id_usuario = u.id_usuario
         JOIN Conductor c ON v.Conductor_id_conductor = c.id_conductor
@@ -44,7 +44,10 @@ router.get('/viajes', verificarToken, (req, res) => {
         ORDER BY v.id_viaje DESC
     `
     db.query(sql, (err, results) => {
-        if (err) return res.status(500).json({ error: 'Error al obtener viajes' })
+        if (err) {
+            console.error('Error SQL viajes:', err.message)  
+            return res.status(500).json({ error: err.message })
+        }
         res.json(results)
     })
 })
@@ -52,12 +55,13 @@ router.get('/viajes', verificarToken, (req, res) => {
 // VIAJES - agregar
 router.post('/viajes', verificarToken, (req, res) => {
     const { id_usuario, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, estado, monto_cobrado } = req.body
-    const sql = `
-        INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, fecha_solicitud, estado, monto_cobrado)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `
+    console.log('Datos recibidos:', req.body)
+    const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, fecha_salida, estado, monto_cobrado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     db.query(sql, [id_usuario, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, estado, monto_cobrado], (err) => {
-        if (err) return res.status(500).json({ error: 'Error al agregar viaje' })
+        if (err) {
+            console.error('Error SQL insert viaje:', err.message)
+            return res.status(500).json({ error: err.message })
+        }
         res.status(201).json({ mensaje: 'Viaje agregado correctamente' })
     })
 })
