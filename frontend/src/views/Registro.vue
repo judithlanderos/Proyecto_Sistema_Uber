@@ -89,7 +89,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { registroService } from '../services/authService'
+import { registroService, loginService } from '../services/authService'
 import { validarNombre, validarApellido, validarCorreo, validarTelefono, validarPassword } from '../utils/validaciones'
 
 const router = useRouter()
