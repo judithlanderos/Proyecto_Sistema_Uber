@@ -10,7 +10,7 @@
                     v-model="form.nombre"
                     type="text"
                     placeholder="Tu nombre"
-                    @input="validarNombre"
+                    @input="errores.nombre = validarNombre(form.nombre)"
                 />
                 <span class="error-campo" v-if="errores.nombre">{{ errores.nombre }}</span>
             </div>
@@ -21,18 +21,18 @@
                     v-model="form.primer_ap"
                     type="text"
                     placeholder="Primer apellido"
-                    @input="validarPrimerAp"
+                    @input="errores.primer_ap = validarApellido(form.primer_ap)"
                 />
                 <span class="error-campo" v-if="errores.primer_ap">{{ errores.primer_ap }}</span>
             </div>
 
             <div class="campo">
-                <label>Segundo Apellido</label>
+                <label>Segundo Apellido <span class="opcional">(opcional)</span></label>
                 <input
                     v-model="form.segundo_ap"
                     type="text"
-                    placeholder="Segundo apellido (opcional)"
-                    @input="validarSegundoAp"
+                    placeholder="Segundo apellido"
+                    @input="errores.segundo_ap = validarApellido(form.segundo_ap, false)"
                 />
                 <span class="error-campo" v-if="errores.segundo_ap">{{ errores.segundo_ap }}</span>
             </div>
@@ -43,7 +43,7 @@
                     v-model="form.correo"
                     type="text"
                     placeholder="correo@ejemplo.com"
-                    @input="validarCorreo"
+                    @input="errores.correo = validarCorreo(form.correo)"
                 />
                 <span class="error-campo" v-if="errores.correo">{{ errores.correo }}</span>
             </div>
@@ -54,8 +54,8 @@
                     v-model="form.telefono"
                     type="text"
                     placeholder="10 digitos"
-                    @input="validarTelefono"
                     maxlength="10"
+                    @input="manejarTelefono"
                 />
                 <span class="error-campo" v-if="errores.telefono">{{ errores.telefono }}</span>
             </div>
@@ -66,15 +66,17 @@
                     v-model="form.password"
                     type="password"
                     placeholder="Minimo 6 caracteres"
-                    @input="validarPassword"
+                    @input="errores.password = validarPassword(form.password)"
                 />
                 <span class="error-campo" v-if="errores.password">{{ errores.password }}</span>
             </div>
 
-            <p v-if="error" class="error">{{ error }}</p>
+            <p v-if="errorGeneral" class="error-general">{{ errorGeneral }}</p>
             <p v-if="exito" class="exito">{{ exito }}</p>
 
-            <button @click="registrar" class="boton">Crear Cuenta</button>
+            <button @click="registrar" class="boton" :disabled="cargando">
+                {{ cargando ? 'Registrando...' : 'Crear Cuenta' }}
+            </button>
 
             <p class="enlace">
                 Ya tienes cuenta?
@@ -87,11 +89,13 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { registroService } from '../services/authService'
+import { validarNombre, validarApellido, validarCorreo, validarTelefono, validarPassword } from '../utils/validaciones'
 
 const router = useRouter()
-const error = ref('')
+const errorGeneral = ref('')
 const exito = ref('')
+const cargando = ref(false)
 
 const form = ref({
     nombre: '',
@@ -111,101 +115,34 @@ const errores = ref({
     password: ''
 })
 
-const soloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/
-
-const validarNombre = () => {
-    if (!form.value.nombre) {
-        errores.value.nombre = 'El nombre es obligatorio'
-    } else if (!soloLetras.test(form.value.nombre)) {
-        errores.value.nombre = 'Solo se permiten letras'
-    } else if (form.value.nombre.length < 2) {
-        errores.value.nombre = 'Minimo 2 caracteres'
-    } else {
-        errores.value.nombre = ''
-    }
-}
-
-const validarPrimerAp = () => {
-    if (!form.value.primer_ap) {
-        errores.value.primer_ap = 'El primer apellido es obligatorio'
-    } else if (!soloLetras.test(form.value.primer_ap)) {
-        errores.value.primer_ap = 'Solo se permiten letras'
-    } else {
-        errores.value.primer_ap = ''
-    }
-}
-
-const validarSegundoAp = () => {
-    if (form.value.segundo_ap && !soloLetras.test(form.value.segundo_ap)) {
-        errores.value.segundo_ap = 'Solo se permiten letras'
-    } else {
-        errores.value.segundo_ap = ''
-    }
-}
-
-const validarCorreo = () => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!form.value.correo) {
-        errores.value.correo = 'El correo es obligatorio'
-    } else if (!regex.test(form.value.correo)) {
-        errores.value.correo = 'Formato invalido, ejemplo: correo@gmail.com'
-    } else {
-        errores.value.correo = ''
-    }
-}
-
-const validarTelefono = () => {
-    const soloNumeros = /^[0-9]*$/
-    if (!form.value.telefono) {
-        errores.value.telefono = 'El telefono es obligatorio'
-    } else if (!soloNumeros.test(form.value.telefono)) {
-        errores.value.telefono = 'Solo se permiten numeros'
-        form.value.telefono = form.value.telefono.replace(/[^0-9]/g, '')
-    } else if (form.value.telefono.length < 10) {
-        errores.value.telefono = 'El telefono debe tener 10 digitos'
-    } else {
-        errores.value.telefono = ''
-    }
-}
-
-const validarPassword = () => {
-    if (!form.value.password) {
-        errores.value.password = 'La contrasena es obligatoria'
-    } else if (form.value.password.length < 6) {
-        errores.value.password = 'Minimo 6 caracteres'
-    } else {
-        errores.value.password = ''
-    }
+const manejarTelefono = () => {
+    form.value.telefono = form.value.telefono.replace(/[^0-9]/g, '')
+    errores.value.telefono = validarTelefono(form.value.telefono)
 }
 
 const formularioValido = () => {
-    validarNombre()
-    validarPrimerAp()
-    validarSegundoAp()
-    validarCorreo()
-    validarTelefono()
-    validarPassword()
-
-    return !errores.value.nombre &&
-           !errores.value.primer_ap &&
-           !errores.value.segundo_ap &&
-           !errores.value.correo &&
-           !errores.value.telefono &&
-           !errores.value.password
+    errores.value.nombre = validarNombre(form.value.nombre)
+    errores.value.primer_ap = validarApellido(form.value.primer_ap)
+    errores.value.segundo_ap = validarApellido(form.value.segundo_ap, false)
+    errores.value.correo = validarCorreo(form.value.correo)
+    errores.value.telefono = validarTelefono(form.value.telefono)
+    errores.value.password = validarPassword(form.value.password)
+    return !Object.values(errores.value).some(e => e !== '')
 }
 
 const registrar = async () => {
-    error.value = ''
+    errorGeneral.value = ''
     exito.value = ''
-
     if (!formularioValido()) return
-
+    cargando.value = true
     try {
-        await axios.post('http://localhost:3000/api/auth/registro', form.value)
+        await registroService(form.value)
         exito.value = 'Cuenta creada correctamente'
         setTimeout(() => router.push('/login'), 1500)
     } catch (err) {
-        error.value = err.response?.data?.error || 'Error al registrar'
+        errorGeneral.value = err.response?.data?.error || 'Error al registrar'
+    } finally {
+        cargando.value = false
     }
 }
 </script>
@@ -217,7 +154,7 @@ const registrar = async () => {
     justify-content: center;
     align-items: center;
     background-color: #0a0a0a;
-    padding: 40px 20px;
+    padding: 20px;
 }
 
 .tarjeta {
@@ -226,7 +163,7 @@ const registrar = async () => {
     border-radius: 12px;
     padding: 40px;
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
@@ -256,6 +193,11 @@ const registrar = async () => {
     margin-bottom: 8px;
 }
 
+.opcional {
+    color: #555555;
+    font-size: 12px;
+}
+
 .campo input {
     width: 100%;
     padding: 12px 16px;
@@ -266,17 +208,30 @@ const registrar = async () => {
     font-size: 15px;
     outline: none;
     transition: border 0.3s;
+    box-sizing: border-box;
 }
 
-.campo input:focus {
-    border-color: #4ade80;
-}
+.campo input:focus { border-color: #4ade80; }
 
 .error-campo {
     color: #f87171;
     font-size: 12px;
     margin-top: 5px;
     display: block;
+}
+
+.error-general {
+    color: #f87171;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.exito {
+    color: #4ade80;
+    font-size: 13px;
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 .boton {
@@ -293,23 +248,8 @@ const registrar = async () => {
     transition: background-color 0.3s;
 }
 
-.boton:hover {
-    background-color: #22c55e;
-}
-
-.error {
-    color: #f87171;
-    font-size: 13px;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-.exito {
-    color: #4ade80;
-    font-size: 13px;
-    margin-bottom: 10px;
-    text-align: center;
-}
+.boton:hover { background-color: #22c55e; }
+.boton:disabled { background-color: #2a2a2a; color: #a0a0a0; cursor: not-allowed; }
 
 .enlace {
     text-align: center;
@@ -324,7 +264,11 @@ const registrar = async () => {
     font-weight: 500;
 }
 
-.enlace a:hover {
-    text-decoration: underline;
+.enlace a:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+    .tarjeta { padding: 24px 16px; }
+    .titulo { font-size: 20px; }
+    .subtitulo { font-size: 16px; }
 }
 </style>
