@@ -83,6 +83,10 @@
     background-color: #0a0a0a;
     color: #ffffff;
     min-height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+    left: 0;
 }
 
 /* NAVBAR */
@@ -90,8 +94,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 60px;
+    padding: 20px 40px;
     border-bottom: 1px solid #1f1f1f;
+    width: 100%;
+    box-sizing: border-box;
+
 }
 
 .logo {
@@ -112,6 +119,8 @@
     align-items: center;
     text-align: center;
     padding: 100px 20px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .hero-titulo {
@@ -235,5 +244,12 @@
 .grande {
     padding: 14px 32px;
     font-size: 16px;
+}
+
+@media (min-width: 0px) {
+    .pagina {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
 }
 </style>

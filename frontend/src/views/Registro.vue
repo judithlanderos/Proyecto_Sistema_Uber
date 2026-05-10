@@ -158,6 +158,10 @@ const registrar = async () => {
     align-items: center;
     background-color: #0a0a0a;
     padding: 20px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
 .tarjeta {
