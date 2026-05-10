@@ -13,8 +13,13 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
-body {
+html, body {
+    background-color: #0a0a0a !important;
+    min-height: 100vh;
+}
+
+#app {
     background-color: #0a0a0a;
-    color: #ffffff;
+    min-height: 100vh;
 }
 </style>
