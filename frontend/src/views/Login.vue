@@ -28,6 +28,15 @@
 
             <p v-if="errorGeneral" class="error-general">{{ errorGeneral }}</p>
 
+            <div class="campo">
+            <VueRecaptcha
+                sitekey="6LeZX-ksAAAAALMh8W8Pps3WlT5SjklYJOG02JGo"
+                @verify="onCaptchaVerified"
+                @expired="onCaptchaExpired"
+            />
+            <span class="error-campo" v-if="!captchaValido && intentoEnvio">Verifica que no eres un robot</span>
+        </div>
+
             <button @click="iniciarSesion" class="boton" :disabled="cargando">
                 {{ cargando ? 'Ingresando...' : 'Iniciar Sesion' }}
             </button>
@@ -46,6 +55,21 @@ import { useRouter } from 'vue-router'
 import { loginService } from '../services/authService'
 import { validarCorreo, validarPassword } from '../utils/validaciones'
 
+import VueRecaptcha from 'vue3-recaptcha2'
+
+const captchaValido = ref(false)
+const captchaToken = ref('')
+
+const onCaptchaVerified = (token) => {
+    captchaToken.value = token
+    captchaValido.value = true
+}
+
+const onCaptchaExpired = () => {
+    captchaToken.value = ''
+    captchaValido.value = false
+}
+
 const router = useRouter()
 const correo = ref('')
 const password = ref('')
@@ -57,7 +81,11 @@ const errores = ref({
     password: ''
 })
 
+const intentoEnvio = ref(false)
+
 const iniciarSesion = async () => {
+    intentoEnvio.value = true
+    if (!captchaValido.value) return
     errores.value.correo = validarCorreo(correo.value)
     errores.value.password = validarPassword(password.value)
 

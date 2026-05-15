@@ -14,8 +14,8 @@
         <section class="hero">
             <h1 class="hero-titulo">Gestion de Viajes <span class="verde">Uber</span></h1>
             <p class="hero-descripcion">
-                Administra usuarios, conductores, vehiculos, viajes y pagos
-                desde una sola plataforma. Simple, rapido y seguro.
+                Donde moverte es más fácil, rápido y seguro. Solicita viajes en cualquier momento, llega a
+                tu destino con comodidad y disfruta de una experiencia confiable al alcance de tu mano.
             </p>
             <div class="hero-botones">
                 <router-link to="/registro" class="btn-verde grande">Comenzar Ahora</router-link>
@@ -31,7 +31,7 @@
                 <div class="tarjeta">
                     <div class="icono">🧑‍💼</div>
                     <h3>Gestion de Usuarios</h3>
-                    <p>Registra y administra pasajeros con su informacion completa y metodos de pago.</p>
+                    <p>Registrate y administra pasajeros con su informacion completa y metodos de pago a utilizar.</p>
                 </div>
 
                 <div class="tarjeta">

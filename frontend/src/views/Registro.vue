@@ -9,7 +9,7 @@
                 <input
                     v-model="form.nombre"
                     type="text"
-                    placeholder="Tu nombre"
+                    placeholder="Tu nombre (Solo letras)"
                     @input="errores.nombre = validarNombre(form.nombre)"
                 />
                 <span class="error-campo" v-if="errores.nombre">{{ errores.nombre }}</span>
@@ -20,7 +20,7 @@
                 <input
                     v-model="form.primer_ap"
                     type="text"
-                    placeholder="Primer apellido"
+                    placeholder="Primer apellido (Solo letras)"
                     @input="errores.primer_ap = validarApellido(form.primer_ap)"
                 />
                 <span class="error-campo" v-if="errores.primer_ap">{{ errores.primer_ap }}</span>
@@ -31,7 +31,7 @@
                 <input
                     v-model="form.segundo_ap"
                     type="text"
-                    placeholder="Segundo apellido"
+                    placeholder="Segundo apellido (Solo letras)"
                     @input="errores.segundo_ap = validarApellido(form.segundo_ap, false)"
                 />
                 <span class="error-campo" v-if="errores.segundo_ap">{{ errores.segundo_ap }}</span>
@@ -53,7 +53,7 @@
                 <input
                     v-model="form.telefono"
                     type="text"
-                    placeholder="10 digitos"
+                    placeholder="10 digitos (Solo numeros)"
                     maxlength="10"
                     @input="manejarTelefono"
                 />
@@ -74,6 +74,15 @@
             <p v-if="errorGeneral" class="error-general">{{ errorGeneral }}</p>
             <p v-if="exito" class="exito">{{ exito }}</p>
 
+            <div class="campo">
+                <VueRecaptcha
+                    sitekey="6LeZX-ksAAAAALMh8W8Pps3WlT5SjklYJOG02JGo"
+                    @verify="onCaptchaVerified"
+                    @expired="onCaptchaExpired"
+                />
+                <span class="error-campo" v-if="!captchaValido && intentoEnvio">Verifica que no eres un robot</span>
+            </div>
+
             <button @click="registrar" class="boton" :disabled="cargando">
                 {{ cargando ? 'Registrando...' : 'Crear Cuenta' }}
             </button>
@@ -91,6 +100,21 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { registroService, loginService } from '../services/authService'
 import { validarNombre, validarApellido, validarCorreo, validarTelefono, validarPassword } from '../utils/validaciones'
+
+import VueRecaptcha from 'vue3-recaptcha2'
+
+const captchaValido = ref(false)
+const captchaToken = ref('')
+
+const onCaptchaVerified = (token) => {
+    captchaToken.value = token
+    captchaValido.value = true
+}
+
+const onCaptchaExpired = () => {
+    captchaToken.value = ''
+    captchaValido.value = false
+}
 
 const router = useRouter()
 const errorGeneral = ref('')
@@ -130,7 +154,12 @@ const formularioValido = () => {
     return !Object.values(errores.value).some(e => e !== '')
 }
 
+const intentoEnvio = ref(false)
+
+
 const registrar = async () => {
+     intentoEnvio.value = true
+    if (!captchaValido.value) return
     errorGeneral.value = ''
     exito.value = ''
     if (!formularioValido()) return
@@ -155,14 +184,15 @@ const registrar = async () => {
     min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     background-color: #0a0a0a;
-    padding: 20px;
-    width: 100%;
-    position: fixed;
-    top: 0;
+    padding: 40px 20px;
+    width: 100vw;
+    position: relative;
     left: 0;
+    margin-left: 0 !important;
 }
+
 
 .tarjeta {
     background-color: #141414;
@@ -172,6 +202,7 @@ const registrar = async () => {
     width: 100%;
     max-width: 420px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    margin: auto;
 }
 
 .titulo {

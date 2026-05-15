@@ -15,21 +15,20 @@
 html, body {
     background-color: #0a0a0a !important;
     min-height: 100vh;
-    margin-left: 0 !important;
-    padding-left: 0 !important;
 }
 
 #app {
     background-color: #0a0a0a;
     min-height: 100vh;
-    margin-left: 0 !important;
 }
 
 .main-sidebar {
-    display: none !important;
+    display: block !important;
+    visibility: visible !important;
+    z-index: 1038 !important;
 }
 
-.content-wrapper {
+.contenedor {
     margin-left: 0 !important;
 }
 </style>

@@ -3,10 +3,22 @@
 
         <!-- NAVBAR -->
         <nav class="main-header navbar navbar-expand navbar-dark" style="background-color: #141414; border-bottom: 1px solid #2a2a2a;">
-            <span style="color: #4ade80; font-weight: 700; font-size: 20px; padding-left: 16px;">SistemaUber</span>
-            <ul class="navbar-nav ml-auto align-items-center">
+            <ul class="navbar-nav">
                 <li class="nav-item">
-                    <span class="nav-link" style="color: #a0a0a0;">{{ usuario?.nombre }} {{ usuario?.primer_ap }}</span>
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+                        <i class="fas fa-bars" style="color:#4ade80;"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link" style="color:#4ade80; font-weight:700; font-size:18px;">SistemaUber</span>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <span class="nav-link" style="color:#a0a0a0;">
+                        <i class="fas fa-user" style="color:#4ade80;"></i>
+                        {{ usuario?.nombre }} {{ usuario?.primer_ap }}
+                    </span>
                 </li>
                 <li class="nav-item">
                     <button @click="cerrarSesion" class="btn-salir">
@@ -16,58 +28,108 @@
             </ul>
         </nav>
 
-        <!-- CONTENIDO -->
-        <div class="content-wrapper" style="background-color: #0a0a0a; min-height: 100vh;">
+        <!-- SIDEBAR -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #141414;">
+            <a href="#" class="brand-link" style="background-color:#141414; border-bottom:1px solid #2a2a2a;">
+                <span class="brand-text font-weight-light" style="color:#4ade80;">SistemaUber</span>
+            </a>
+            <div class="sidebar">
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex" style="border-bottom: 1px solid #2a2a2a;">
+                    <div class="image">
+                        <i class="fas fa-user-circle" style="color:#4ade80; font-size:36px; padding-left:8px;"></i>
+                    </div>
+                    <div class="info">
+                        <span style="color:#4ade80; font-weight:600; padding-left:8px;">
+                            {{ usuario?.nombre }}
+                        </span>
+                    </div>
+                </div>
 
-            <!-- ENCABEZADO CON BOTONES -->
-            <div class="encabezado">
-                <h2 class="bienvenido">Bienvenido, <span class="verde">{{ usuario?.nombre }} {{ usuario?.primer_ap }}</span></h2>
-                <div class="botones-modulos">
-                    <button
-                        v-for="item in menu"
-                        :key="item.nombre"
-                        @click="moduloActivo = item.componente"
-                        :class="['btn-modulo', { activo: moduloActivo === item.componente }]"
-                    >
-                        <i :class="item.icono"></i> {{ item.nombre }}
-                    </button>
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+                        <li class="nav-item" v-for="item in menu" :key="item.nombre">
+                            <a href="#" class="nav-link" :class="{ active: moduloActivo === item.componente }" @click.prevent="moduloActivo = item.componente">
+                                <i :class="[item.icono, 'nav-icon']"></i>
+                                <span>{{ item.nombre }}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- CONTENIDO -->
+        <div class="content-wrapper" style="background-color:#0a0a0a;">
+            <div class="content-header" style="border-bottom: 1px solid #2a2a2a; background-color: #141414;">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 style="color:#ffffff;">{{ tituloActivo }}</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <p style="color:#a0a0a0; text-align:right; margin-top:8px;">
+                                Bienvenido, <span style="color:#4ade80;">{{ usuario?.nombre }} {{ usuario?.primer_ap }}</span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- MODULO ACTIVO -->
-            <div class="contenido-modulo">
-                <component :is="moduloActivo" />
+            <div class="content">
+                <div class="container-fluid">
+                    <component :is="moduloActivo" />
+                </div>
             </div>
-
         </div>
+
 
     </div>
 </template>
 
 <script setup>
-import { ref,computed, markRaw } from 'vue'
+import { ref, computed, markRaw, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import Viajes from './modulos/Viajes.vue'
 import Usuarios from './modulos/Usuarios.vue'
 import Conductores from './modulos/Conductores.vue'
 import Vehiculos from './modulos/Vehiculos.vue'
+import Viajes from './modulos/Viajes.vue'
 import Pagos from './modulos/Pagos.vue'
 import Calificaciones from './modulos/Calificaciones.vue'
 
+onMounted(() => {
+     setTimeout(() => {
+        if (window.AdminLTE) {
+            window.AdminLTE.init()
+        } else if (window.$) {
+            window.$('[data-widget="pushmenu"]').off('click').on('click', function(e) {
+                e.preventDefault()
+                window.$('body').toggleClass('sidebar-open')
+                window.$('body').toggleClass('sidebar-collapse')
+            })
+        }
+    }, 500)
+})
 const router = useRouter()
 const usuario = ref(JSON.parse(localStorage.getItem('usuario')))
 const moduloActivo = ref(markRaw(Viajes))
 
+
 const menu = [
-    { nombre: 'Usuarios',       componente: Usuarios,       icono: 'fas fa-users' },
-    { nombre: 'Conductores',    componente: Conductores,    icono: 'fas fa-id-card' },
-    { nombre: 'Vehiculos',      componente: Vehiculos,      icono: 'fas fa-car' },
-    { nombre: 'Viajes',         componente: Viajes,         icono: 'fas fa-route' },
-    { nombre: 'Pagos',          componente: Pagos,          icono: 'fas fa-credit-card' },
-    { nombre: 'Calificaciones', componente: Calificaciones, icono: 'fas fa-star' },
+    { nombre: 'Usuarios',       componente: markRaw(Usuarios),       icono: 'fas fa-users' },
+    { nombre: 'Conductores',    componente: markRaw(Conductores),    icono: 'fas fa-id-card' },
+    { nombre: 'Vehiculos',      componente: markRaw(Vehiculos),      icono: 'fas fa-car' },
+    { nombre: 'Viajes',         componente: markRaw(Viajes),         icono: 'fas fa-route' },
+    { nombre: 'Pagos',          componente: markRaw(Pagos),          icono: 'fas fa-credit-card' },
+    { nombre: 'Calificaciones', componente: markRaw(Calificaciones), icono: 'fas fa-star' },
 ]
 
+const tituloActivo = computed(() => {
+    const item = menu.find(m => m.componente === moduloActivo.value)
+    return item ? item.nombre : ''
+})
+
 const cerrarSesion = () => {
+    document.body.className = ''
     localStorage.removeItem('token')
     localStorage.removeItem('usuario')
     router.push('/login')
@@ -75,76 +137,40 @@ const cerrarSesion = () => {
 </script>
 
 <style scoped>
-.encabezado {
-    padding: 28px 32px 20px 32px;
-    border-bottom: 1px solid #2a2a2a;
-    background-color: #141414;
-}
-
-.bienvenido {
-    color: #ffffff;
-    font-size: 22px;
-    font-weight: 600;
-    margin-bottom: 18px;
-}
-
-.verde {
-    color: #4ade80;
-}
-
-.botones-modulos {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.btn-modulo {
-    background-color: #1f1f1f;
-    border: 1px solid #2a2a2a;
-    color: #a0a0a0;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
+.nav-link {
+    color: #a0a0a0 !important;
     transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 8px;
 }
 
-.btn-modulo:hover {
-    background-color: #2a2a2a;
-    color: #ffffff;
+.nav-link:hover {
+    background-color: #1f1f1f !important;
+    color: #ffffff !important;
 }
 
-.btn-modulo.activo {
-    background-color: #4ade80;
-    color: #0a0a0a;
-    border-color: #4ade80;
+.nav-link.active {
+    background-color: #4ade80 !important;
+    color: #0a0a0a !important;
     font-weight: 600;
-}
-
-.contenido-modulo {
-    padding: 32px;
 }
 
 .btn-salir {
     background: none;
     border: 1px solid #f87171;
     color: #f87171;
-    padding: 8px 16px;
+    padding: 6px 14px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     margin-right: 12px;
     transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
 }
 
 .btn-salir:hover {
     background-color: #f87171;
     color: #ffffff;
+}
+
+.content-wrapper {
+    min-height: calc(100vh - 57px);
 }
 </style>
