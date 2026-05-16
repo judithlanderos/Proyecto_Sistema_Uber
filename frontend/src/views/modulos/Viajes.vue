@@ -2,7 +2,6 @@
     <div>
         <!-- BOTON AGREGAR -->
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 style="color: #ffffff;">Lista de Viajes</h4>
             <button class="btn-verde" @click="abrirModalAgregar">
                 <i class="fas fa-plus"></i> Agregar Viaje
             </button>
@@ -10,7 +9,7 @@
 
         <!-- TABLA -->
         <div class="tabla-contenedor">
-            <table class="tabla">
+            <table ref="tablaRef" class="tabla display nowrap" style="width:100%">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -53,140 +52,68 @@
         </div>
 
         <!-- MODAL -->
-        <div class="modal-fondo" v-if="modalVisible">
-            <div class="modal-caja">
-                <h4 style="color:#ffffff; margin-bottom: 20px;">
-                    {{ modoEditar ? 'Editar Viaje' : 'Agregar Viaje' }}
-                </h4>
-
-                <div class="campo" v-if="!modoEditar">
-                    <label>Pasajero</label>
-                    <select v-model="form.id_usuario">
-                        <option value="">Selecciona un pasajero</option>
-                        <option v-for="u in usuarios" :key="u.id_usuario" :value="u.id_usuario">
-                            {{ u.nombre }} {{ u.primer_ap }}
-                        </option>
-                    </select>
-                    <span class="error-campo" v-if="errores.id_usuario">{{ errores.id_usuario }}</span>
-                </div>
-
-                <div class="campo" v-if="!modoEditar">
-                    <label>Conductor</label>
-                    <select v-model="form.id_conductor">
-                        <option value="">Selecciona un conductor</option>
-                        <option v-for="c in conductores" :key="c.id_conductor" :value="c.id_conductor">
-                            {{ c.nombre }} {{ c.primer_ap }}
-                        </option>
-                    </select>
-                    <span class="error-campo" v-if="errores.id_conductor">{{ errores.id_conductor }}</span>
-                </div>
-
-                <div class="campo" v-if="!modoEditar">
-                    <label>Vehiculo</label>
-                    <select v-model="form.id_vehiculo">
-                        <option value="">Selecciona un vehiculo</option>
-                        <option v-for="v in vehiculos" :key="v.id_vehiculo" :value="v.id_vehiculo">
-                            {{ v.placa }} — {{ v.marca }} {{ v.modelo }}
-                        </option>
-                    </select>
-                    <span class="error-campo" v-if="errores.id_vehiculo">{{ errores.id_vehiculo }}</span>
-                </div>
-
-                <div class="campo">
-                    <label>Origen</label>
-                    <input v-model="form.origen" type="text" placeholder="Direccion de origen" @input="validarOrigen" />
-                    <span class="error-campo" v-if="errores.origen">{{ errores.origen }}</span>
-                </div>
-
-                <div class="campo">
-                    <label>Destino</label>
-                    <input v-model="form.destino" type="text" placeholder="Direccion de destino" @input="validarDestino" />
-                    <span class="error-campo" v-if="errores.destino">{{ errores.destino }}</span>
-                </div>
-
-                <div class="campo">
-                    <label>Estado</label>
-                    <select v-model="form.estado">
-                        <option value="">Selecciona estado</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="en_curso">En curso</option>
-                        <option value="completado">Completado</option>
-                        <option value="cancelado">Cancelado</option>
-                    </select>
-                    <span class="error-campo" v-if="errores.estado">{{ errores.estado }}</span>
-                </div>
-
-                <div class="campo">
-                    <label>Monto Cobrado</label>
-                    <input v-model="form.monto_cobrado" type="text" placeholder="0.00" @input="validarMonto" />
-                    <span class="error-campo" v-if="errores.monto_cobrado">{{ errores.monto_cobrado }}</span>
-                </div>
-
-                <div class="campo" v-if="!modoEditar">
-                    <label>Fecha Solicitud</label>
-                    <input v-model="form.fecha_solicitud" type="text" placeholder="2024-01-01" @input="validarFecha" />
-                    <span class="error-campo" v-if="errores.fecha_solicitud">{{ errores.fecha_solicitud }}</span>
-                </div>
-
-                <p v-if="errorGeneral" class="error-general">{{ errorGeneral }}</p>
-                <p v-if="exito" class="exito">{{ exito }}</p>
-
-                <div class="modal-botones">
-                    <button class="btn-verde" @click="guardar">
-                        {{ modoEditar ? 'Actualizar' : 'Guardar' }}
-                    </button>
-                    <button class="btn-cancelar" @click="cerrarModal">Cancelar</button>
-                </div>
-            </div>
-        </div>
-
+        <ViajeModal
+            v-if="modalVisible"
+            :modoEditar="modoEditar"
+            :viajeEditar="viajeSeleccionado"
+            :usuarios="usuarios"
+            :conductores="conductores"
+            :vehiculos="vehiculos"
+            @cerrar="cerrarModal"
+            @guardado="cargarViajes"
+        />
     </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue'
+import ViajeModal from '@/components/viajes/ViajeModal.vue'
+import {
+    getViajes,
+    getUsuarios,
+    getConductores,
+    getVehiculos,
+    deleteViaje
+} from '@/services/viajesService'
 
+// ─── DataTable ────────────────────────────────────────────────────────────────
+const tablaRef = ref(null)
+let dtInstance = null
+
+const iniciarDataTable = () => {
+    dtInstance = window.$(tablaRef.value).DataTable({
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json'
+        },
+        columnDefs: [{ orderable: false, targets: 8 }],
+        order: [[0, 'asc']],
+        responsive: true,
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50]
+    })
+}
+
+// ─── Estado ───────────────────────────────────────────────────────────────────
 const viajes = ref([])
 const usuarios = ref([])
 const conductores = ref([])
 const vehiculos = ref([])
+
 const modalVisible = ref(false)
 const modoEditar = ref(false)
-const errorGeneral = ref('')
-const exito = ref('')
-const idEditando = ref(null)
+const viajeSeleccionado = ref(null)
 
-const form = ref({
-    id_usuario: '',
-    id_conductor: '',
-    id_vehiculo: '',
-    origen: '',
-    destino: '',
-    estado: '',
-    monto_cobrado: '',
-    fecha_solicitud: ''
-})
-
-const errores = ref({
-    id_usuario: '',
-    id_conductor: '',
-    id_vehiculo: '',
-    origen: '',
-    destino: '',
-    estado: '',
-    monto_cobrado: '',
-    fecha_solicitud: ''
-})
-
-const getHeaders = () => {
-    const token = localStorage.getItem('token')
-    return { Authorization: `Bearer ${token}` }
-}
+// ─── Carga de datos ───────────────────────────────────────────────────────────
 const cargarViajes = async () => {
     try {
-        const res = await axios.get('http://localhost:3000/api/viajes', { headers: getHeaders() })
+        if (dtInstance) {
+            dtInstance.destroy()
+            dtInstance = null
+        }
+        const res = await getViajes()
         viajes.value = res.data
+        await nextTick()
+        iniciarDataTable()
     } catch (err) {
         console.error('Error cargando viajes', err)
     }
@@ -195,9 +122,9 @@ const cargarViajes = async () => {
 const cargarDesplegables = async () => {
     try {
         const [u, c, v] = await Promise.all([
-            axios.get('http://localhost:3000/api/usuarios', { headers: getHeaders() }),
-            axios.get('http://localhost:3000/api/conductores', { headers: getHeaders() }),
-            axios.get('http://localhost:3000/api/vehiculos', { headers: getHeaders() })
+            getUsuarios(),
+            getConductores(),
+            getVehiculos()
         ])
         usuarios.value = u.data
         conductores.value = c.data
@@ -207,117 +134,51 @@ const cargarDesplegables = async () => {
     }
 }
 
-const validarOrigen = () => {
-    errores.value.origen = !form.value.origen ? 'El origen es obligatorio' : ''
-}
-const validarDestino = () => {
-    errores.value.destino = !form.value.destino ? 'El destino es obligatorio' : ''
-}
-const validarMonto = () => {
-    const regex = /^\d+(\.\d{1,2})?$/
-    if (!form.value.monto_cobrado) {
-        errores.value.monto_cobrado = ''
-    } else if (!regex.test(form.value.monto_cobrado)) {
-        errores.value.monto_cobrado = 'Ingresa un monto valido, ejemplo: 150.00'
-    } else {
-        errores.value.monto_cobrado = ''
-    }
-}
-const validarFecha = () => {
-    const regex = /^\d{4}-\d{2}-\d{2}$/
-    if (!form.value.fecha_solicitud) {
-        errores.value.fecha_solicitud = 'La fecha es obligatoria'
-    } else if (!regex.test(form.value.fecha_solicitud)) {
-        errores.value.fecha_solicitud = 'Formato invalido, usa: 2024-01-01'
-    } else {
-        errores.value.fecha_solicitud = ''
-    }
-}
-
-const formularioValido = () => {
-    if (!modoEditar.value) {
-        errores.value.id_usuario = !form.value.id_usuario ? 'Selecciona un pasajero' : ''
-        errores.value.id_conductor = !form.value.id_conductor ? 'Selecciona un conductor' : ''
-        errores.value.id_vehiculo = !form.value.id_vehiculo ? 'Selecciona un vehiculo' : ''
-        validarFecha()
-    }
-    errores.value.estado = !form.value.estado ? 'Selecciona un estado' : ''
-    validarOrigen()
-    validarDestino()
-    validarMonto()
-
-    return !Object.values(errores.value).some(e => e !== '')
-}
-
+// ─── Modal ────────────────────────────────────────────────────────────────────
 const abrirModalAgregar = () => {
     modoEditar.value = false
-    idEditando.value = null
-    form.value = { id_usuario: '', id_conductor: '', id_vehiculo: '', origen: '', destino: '', estado: '', monto_cobrado: '', fecha_solicitud: '' }
-    errores.value = { id_usuario: '', id_conductor: '', id_vehiculo: '', origen: '', destino: '', estado: '', monto_cobrado: '', fecha_solicitud: '' }
-    errorGeneral.value = ''
-    exito.value = ''
+    viajeSeleccionado.value = null
     modalVisible.value = true
 }
 
 const abrirModalEditar = (viaje) => {
     modoEditar.value = true
-    idEditando.value = viaje.id_viaje
-    form.value = {
-        origen: viaje.origen,
-        destino: viaje.destino,
-        estado: viaje.estado,
-        monto_cobrado: viaje.monto_cobrado || ''
-    }
-    errores.value = { id_usuario: '', id_conductor: '', id_vehiculo: '', origen: '', destino: '', estado: '', monto_cobrado: '', fecha_solicitud: '' }
-    errorGeneral.value = ''
-    exito.value = ''
+    viajeSeleccionado.value = viaje
     modalVisible.value = true
 }
 
 const cerrarModal = () => {
     modalVisible.value = false
+    viajeSeleccionado.value = null
 }
 
-const guardar = async () => {
-    errorGeneral.value = ''
-    exito.value = ''
-    if (!formularioValido()) return
-
-    try {
-        if (modoEditar.value) {
-            await axios.put(`http://localhost:3000/api/viajes/${idEditando.value}`, form.value, { headers: headers() })
-            exito.value = 'Viaje actualizado correctamente'
-        } else {
-            await axios.post('http://localhost:3000/api/viajes', form.value, { headers: headers() })
-            exito.value = 'Viaje agregado correctamente'
-        }
-        await cargarViajes()
-        setTimeout(() => cerrarModal(), 1000)
-    } catch (err) {
-        errorGeneral.value = err.response?.data?.error || 'Error al guardar'
-    }
-}
-
+// ─── Eliminar ─────────────────────────────────────────────────────────────────
 const eliminarViaje = async (id) => {
     if (!confirm('Seguro que deseas eliminar este viaje?')) return
     try {
-        await axios.delete(`http://localhost:3000/api/viajes/${id}`, { headers: headers() })
+        await deleteViaje(id)
         await cargarViajes()
     } catch (err) {
         alert('Error al eliminar viaje')
     }
 }
 
+// ─── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(async () => {
     await cargarViajes()
     await cargarDesplegables()
 })
+
+onBeforeUnmount(() => {
+    if (dtInstance) {
+        dtInstance.destroy()
+        dtInstance = null
+    }
+})
 </script>
 
 <style scoped>
-.tabla-contenedor {
-    overflow-x: auto;
-}
+.tabla-contenedor { overflow-x: auto; }
 
 .tabla {
     width: 100%;
@@ -343,10 +204,67 @@ onMounted(async () => {
     font-size: 14px;
 }
 
-.tabla tr:hover td {
-    background-color: #1a1a1a;
+.tabla tr:hover td { background-color: #1a1a1a; }
+
+/* ── DataTables tema oscuro ── */
+:deep(.dataTables_wrapper) { color: #ffffff; font-size: 14px; }
+
+:deep(.dataTables_length label),
+:deep(.dataTables_filter label) { color: #a0a0a0; }
+
+:deep(.dataTables_length select),
+:deep(.dataTables_filter input) {
+    background-color: #1f1f1f;
+    border: 1px solid #2a2a2a;
+    color: #ffffff;
+    border-radius: 6px;
+    padding: 5px 10px;
+    outline: none;
 }
 
+:deep(.dataTables_filter input:focus) { border-color: #4ade80; }
+
+:deep(.dataTables_info) { color: #a0a0a0; font-size: 13px; }
+
+:deep(.dataTables_paginate .paginate_button) {
+    background-color: #1f1f1f !important;
+    border: 1px solid #2a2a2a !important;
+    color: #a0a0a0 !important;
+    border-radius: 6px;
+    margin: 2px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+:deep(.dataTables_paginate .paginate_button:hover) {
+    background-color: #2a2a2a !important;
+    color: #ffffff !important;
+    border-color: #4ade80 !important;
+}
+
+:deep(.dataTables_paginate .paginate_button.current) {
+    background-color: #4ade80 !important;
+    color: #0a0a0a !important;
+    border-color: #4ade80 !important;
+    font-weight: 700;
+}
+
+:deep(.dataTables_paginate .paginate_button.disabled) {
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+}
+
+:deep(table.dataTable thead th.sorting),
+:deep(table.dataTable thead th.sorting_asc),
+:deep(table.dataTable thead th.sorting_desc) {
+    background-color: #1f1f1f;
+    color: #4ade80;
+}
+
+:deep(table.dataTable thead th.sorting_asc::after),
+:deep(table.dataTable thead th.sorting_desc::after) { color: #4ade80; }
+
+/* ── Badges ── */
 .badge-estado {
     padding: 4px 10px;
     border-radius: 20px;
@@ -354,11 +272,12 @@ onMounted(async () => {
     font-weight: 600;
 }
 
-.badge-estado.pendiente { background-color: #854d0e; color: #fef08a; }
-.badge-estado.en_curso { background-color: #1e3a8a; color: #93c5fd; }
+.badge-estado.pendiente  { background-color: #854d0e; color: #fef08a; }
+.badge-estado.en_curso   { background-color: #1e3a8a; color: #93c5fd; }
 .badge-estado.completado { background-color: #14532d; color: #4ade80; }
-.badge-estado.cancelado { background-color: #7f1d1d; color: #fca5a5; }
+.badge-estado.cancelado  { background-color: #7f1d1d; color: #fca5a5; }
 
+/* ── Botones ── */
 .btn-verde {
     background-color: #4ade80;
     color: #0a0a0a;
@@ -370,7 +289,6 @@ onMounted(async () => {
     cursor: pointer;
     transition: background-color 0.2s;
 }
-
 .btn-verde:hover { background-color: #22c55e; }
 
 .btn-accion {
@@ -382,102 +300,7 @@ onMounted(async () => {
     font-size: 13px;
     transition: opacity 0.2s;
 }
-
-.btn-accion.editar { background-color: #1e3a8a; color: #93c5fd; }
+.btn-accion.editar  { background-color: #1e3a8a; color: #93c5fd; }
 .btn-accion.eliminar { background-color: #7f1d1d; color: #fca5a5; }
 .btn-accion:hover { opacity: 0.8; }
-
-.modal-fondo {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-caja {
-    background-color: #141414;
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
-    padding: 32px;
-    width: 100%;
-    max-width: 480px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.campo {
-    margin-bottom: 16px;
-}
-
-.campo label {
-    display: block;
-    color: #a0a0a0;
-    font-size: 13px;
-    margin-bottom: 6px;
-}
-
-.campo input,
-.campo select {
-    width: 100%;
-    padding: 10px 14px;
-    background-color: #1f1f1f;
-    border: 1px solid #2a2a2a;
-    border-radius: 8px;
-    color: #ffffff;
-    font-size: 14px;
-    outline: none;
-    transition: border 0.2s;
-}
-
-.campo input:focus,
-.campo select:focus { border-color: #4ade80; }
-
-.campo select option { background-color: #1f1f1f; }
-
-.error-campo {
-    color: #f87171;
-    font-size: 12px;
-    margin-top: 4px;
-    display: block;
-}
-
-.error-general {
-    color: #f87171;
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.exito {
-    color: #4ade80;
-    font-size: 13px;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.modal-botones {
-    display: flex;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.btn-cancelar {
-    background-color: #1f1f1f;
-    border: 1px solid #2a2a2a;
-    color: #a0a0a0;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-cancelar:hover {
-    background-color: #2a2a2a;
-    color: #ffffff;
-}
 </style>

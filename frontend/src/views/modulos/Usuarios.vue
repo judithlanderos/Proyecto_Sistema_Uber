@@ -1,7 +1,6 @@
 <template>
     <div>
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 style="color: #ffffff;">Lista de Usuarios</h4>
             <button class="btn-verde" @click="abrirModalAgregar">
                 <i class="fas fa-plus"></i> Agregar Usuario
             </button>
@@ -17,7 +16,7 @@
                         <th>Telefono</th>
                         <th>Fecha Registro</th>
                         <th>Metodos Pago</th>
-                        <th>Acciones</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -31,14 +30,7 @@
                         <td>{{ u.telefono }}</td>
                         <td>{{ u.fecha_registro }}</td>
                         <td><span class="badge-metodos">{{ u.metodos_pago }}</span></td>
-                        <td>
-                            <button class="btn-accion editar" @click="abrirModalEditar(u)">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn-accion eliminar" @click="eliminar(u.id_usuario)">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
+                        
                     </tr>
                 </tbody>
             </table>
