@@ -17,7 +17,7 @@
                 <li class="nav-item">
                     <span class="nav-link" style="color:#a0a0a0;">
                         <i class="fas fa-user" style="color:#4ade80;"></i>
-                        {{ usuario?.nombre }} {{ usuario?.primer_ap }}
+                        Bienvenido, {{ usuario?.nombre }} {{ usuario?.primer_ap }}
                     </span>
                 </li>
                 <li class="nav-item">
@@ -30,20 +30,31 @@
 
         <!-- SIDEBAR -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color: #141414;">
-            <a href="#" class="brand-link" style="background-color:#141414; border-bottom:1px solid #2a2a2a;">
-                <span class="brand-text font-weight-light" style="color:#4ade80;">SistemaUber</span>
+            <a href="#" class="brand-link" style="background-color:#141414; border-bottom:1px solid #2a2a2a;  text-decoration:none;">
+                <span class="brand-text font-weight-light" style="color:#4ade80;">Sistema Uber</span>
             </a>
             <div class="sidebar">
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex" style="border-bottom: 1px solid #2a2a2a;">
-                    <div class="image">
-                        <i class="fas fa-user-circle" style="color:#4ade80; font-size:36px; padding-left:8px;"></i>
+                    <div class="image" style="position:relative; cursor:pointer;" @click="triggerFoto">
+                        <img
+                            v-if="fotoPerfil"
+                            :src="'http://localhost:3000' + fotoPerfil"
+                            style="width:40px; height:40px; border-radius:50%; object-fit:cover;"
+                        />
+                        <i v-else class="fas fa-user-circle fa-2x" style="color:#4ade80; padding-left:8px;"></i>
+                        <input
+                            type="file"
+                            ref="inputFoto"
+                            accept="image/jpeg,image/png"
+                            style="display:none"
+                            @change="subirFoto"
+                        />
                     </div>
                     <div class="info">
-                        <span style="color:#4ade80; font-weight:600; padding-left:8px;">
-                            {{ usuario?.nombre }}
-                        </span>
+                        <span style="color:#4ade80; font-weight:600; padding-left:8px;">{{ usuario?.nombre }}</span>
                     </div>
                 </div>
+            
 
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
@@ -66,11 +77,7 @@
                         <div class="col-sm-6">
                             <h1 style="color:#ffffff;">{{ tituloActivo }}</h1>
                         </div>
-                        <div class="col-sm-6">
-                            <p style="color:#a0a0a0; text-align:right; margin-top:8px;">
-                                Bienvenido, <span style="color:#4ade80;">{{ usuario?.nombre }} {{ usuario?.primer_ap }}</span>
-                            </p>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -95,6 +102,7 @@ import Vehiculos from './modulos/Vehiculos.vue'
 import Viajes from './modulos/Viajes.vue'
 import Pagos from './modulos/Pagos.vue'
 import Calificaciones from './modulos/Calificaciones.vue'
+import axios from 'axios'
 
 onMounted(() => {
      setTimeout(() => {
@@ -134,6 +142,39 @@ const cerrarSesion = () => {
     localStorage.removeItem('usuario')
     router.push('/login')
 }
+
+const inputFoto = ref(null)
+const fotoPerfil = ref(usuario.value?.foto || null)
+
+const triggerFoto = () => {
+    inputFoto.value.click()
+}
+
+const subirFoto = async (e) => {
+    const archivo = e.target.files[0]
+    if (!archivo) return
+
+    const formData = new FormData()
+    formData.append('foto', archivo)
+
+    try {
+        const token = localStorage.getItem('token')
+        const res = await axios.post(
+            `http://localhost:3000/api/usuarios/${usuario.value.id}/foto`,
+            formData,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        )
+        fotoPerfil.value = res.data.url
+    } catch (err) {
+        alert('Error al subir la foto')
+    }
+}
+
 </script>
 
 <style scoped>

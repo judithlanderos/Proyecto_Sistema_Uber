@@ -16,6 +16,45 @@ router.post('/logout', logout)
 router.get('/dashboard/conteos', verificarToken, getConteos)
 router.get('/viajes', verificarToken, getViajes)
 router.post('/viajes', verificarToken, postViaje)
+
+
+router.get('/viajes/detalle/:id', verificarToken, (req, res) => {
+    const sql = `
+        SELECT 
+            v.id_viaje,
+            v.origen,
+            v.destino,
+            v.fecha_salida,
+            v.fecha_inicio,
+            v.fecha_fin,
+            v.distancia_km,
+            v.estado,
+            v.monto_cobrado,
+            CONCAT(u.nombre, ' ', u.primer_ap, ' ', IFNULL(u.segundo_ap,'')) AS pasajero,
+            u.correo AS correo_pasajero,
+            u.telefono AS telefono_pasajero,
+            CONCAT(c.nombre, ' ', c.primer_ap, ' ', IFNULL(c.segundo_ap,'')) AS conductor,
+            c.num_licencia,
+            c.calificacion_prom,
+            ve.placa,
+            ve.marca,
+            ve.modelo,
+            ve.anio,
+            ve.categoria
+        FROM Viaje v
+        JOIN Usuario u ON v.Usuario_id_usuario = u.id_usuario
+        JOIN Conductor c ON v.Conductor_id_conductor = c.id_conductor
+        JOIN Vehiculo ve ON v.Vehiculo_id_vehiculo = ve.id_vehiculo
+        WHERE v.id_viaje = ?
+    `
+    db.query(sql, [req.params.id], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message })
+        if (results.length === 0) return res.status(404).json({ error: 'Viaje no encontrado' })
+        res.json(results[0])
+    })
+})
+
+
 router.put('/viajes/:id', verificarToken, putViaje)
 router.delete('/viajes/:id', verificarToken, deleteViaje)
 
@@ -266,6 +305,42 @@ router.delete('/conductores/:id', verificarToken, (req, res) => {
     db.query(sql, [req.params.id], (err) => {
         if (err) return res.status(500).json({ error: err.message })
         res.json({ mensaje: 'Conductor eliminado correctamente' })
+    })
+})
+
+const multer = require('multer')
+const path = require('path')
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/')
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname)
+        cb(null, `usuario_${req.params.id}${ext}`)
+    }
+})
+
+const upload = multer({
+    storage,
+    limits: { fileSize: 2 * 1024 * 1024 }, // 2MB maximo
+    fileFilter: (req, file, cb) => {
+        const tipos = ['image/jpeg', 'image/png', 'image/jpg']
+        if (tipos.includes(file.mimetype)) {
+            cb(null, true)
+        } else {
+            cb(new Error('Solo se permiten imagenes JPG y PNG'))
+        }
+    }
+})
+
+router.post('/usuarios/:id/foto', verificarToken, upload.single('foto'), (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'No se subio ninguna imagen' })
+    const url = `/uploads/${req.file.filename}`
+    const sql = 'UPDATE Usuario SET foto = ? WHERE id_usuario = ?'
+    db.query(sql, [url, req.params.id], (err) => {
+        if (err) return res.status(500).json({ error: err.message })
+        res.json({ mensaje: 'Foto actualizada correctamente', url })
     })
 })
 
