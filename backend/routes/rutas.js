@@ -138,7 +138,7 @@ router.get('/vehiculos/lista', verificarToken, (req, res) => {
             v.activo,
             CONCAT(c.nombre, ' ', c.primer_ap) AS conductor
         FROM Vehiculo v
-        JOIN Conductor c ON v.Conductor_id_conductor = c.id_conductor
+        JOIN Conductor c ON v.id_conductor = c.id_conductor
         ORDER BY v.id_vehiculo DESC
     `
     db.query(sql, (err, results) => {

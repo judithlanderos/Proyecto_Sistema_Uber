@@ -1,7 +1,6 @@
 <template>
     <div>
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 style="color: #ffffff;">Lista de Conductores</h4>
             <button class="btn-verde" @click="abrirAgregar">
                 <i class="fas fa-plus"></i> Agregar Conductor
             </button>
