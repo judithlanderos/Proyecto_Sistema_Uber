@@ -43,7 +43,7 @@ router.get('/viajes/detalle/:id', verificarToken, (req, res) => {
             ve.categoria
         FROM Viaje v
         JOIN Usuario u ON v.Usuario_id_usuario = u.id_usuario
-        JOIN Conductor c ON v.Conductor_id_conductor = c.id_conductor
+        JOIN Conductor c ON v.id_conductor = c.id_conductor
         JOIN Vehiculo ve ON v.Vehiculo_id_vehiculo = ve.id_vehiculo
         WHERE v.id_viaje = ?
     `
@@ -149,7 +149,7 @@ router.get('/vehiculos/lista', verificarToken, (req, res) => {
 
 router.post('/vehiculos/crear', verificarToken, (req, res) => {
     const { placa, marca, modelo, anio, categoria, id_conductor } = req.body
-    const sql = 'INSERT INTO Vehiculo (placa, marca, modelo, anio, categoria, activo, Conductor_id_conductor) VALUES (?, ?, ?, ?, ?, 0, ?)'
+    const sql = 'INSERT INTO Vehiculo (placa, marca, modelo, anio, categoria, activo, id_conductor) VALUES (?, ?, ?, ?, ?, 0, ?)'
     db.query(sql, [placa, marca, modelo, anio, categoria, id_conductor], (err) => {
         if (err) return res.status(500).json({ error: err.message })
         res.status(201).json({ mensaje: 'Vehiculo creado correctamente' })
@@ -235,7 +235,7 @@ router.get('/calificaciones/lista', verificarToken, (req, res) => {
         FROM Calificacion cal
         JOIN Viaje v ON cal.Viaje_id_viaje = v.id_viaje
         JOIN Usuario u ON v.Usuario_id_usuario = u.id_usuario
-        JOIN Conductor c ON v.Conductor_id_conductor = c.id_conductor
+        JOIN Conductor c ON v.id_conductor = c.id_conductor
         ORDER BY cal.id_calificacion DESC
     `
     db.query(sql, (err, results) => {
@@ -286,7 +286,7 @@ router.get('/conductores/lista', verificarToken, (req, res) => {
             v.marca,
             v.modelo
         FROM Conductor c
-        LEFT JOIN Vehiculo v ON v.Conductor_id_conductor = c.id_conductor AND v.activo = 1
+        LEFT JOIN Vehiculo v ON v.id_conductor = c.id_conductor AND v.activo = 1
         ORDER BY c.id_conductor DESC
     `
     db.query(sql, (err, results) => {
