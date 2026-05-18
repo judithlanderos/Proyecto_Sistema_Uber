@@ -43,7 +43,7 @@ router.get('/viajes/detalle/:id', verificarToken, (req, res) => {
             ve.categoria
         FROM Viaje v
         JOIN Usuario u ON v.Usuario_id_usuario = u.id_usuario
-        JOIN Conductor c ON v.id_conductor = c.id_conductor
+        JOIN Conductor c ON v.Conductor_id_conductor = c.id_conductor
         JOIN Vehiculo ve ON v.Vehiculo_id_vehiculo = ve.id_vehiculo
         WHERE v.id_viaje = ?
     `
