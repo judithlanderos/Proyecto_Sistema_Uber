@@ -54,6 +54,19 @@ router.get('/viajes/detalle/:id', verificarToken, (req, res) => {
     })
 })
 
+router.delete('/viajes/:id', verificarToken, (req, res) => {
+    const id = req.params.id
+    db.query('DELETE FROM Calificacion WHERE Viaje_id_viaje = ?', [id], (err) => {
+        if (err) return res.status(500).json({ error: err.message })
+        db.query('DELETE FROM Pago WHERE Viaje_id_viaje = ?', [id], (err) => {
+            if (err) return res.status(500).json({ error: err.message })
+            db.query('DELETE FROM Viaje WHERE id_viaje = ?', [id], (err) => {
+                if (err) return res.status(500).json({ error: err.message })
+                res.json({ mensaje: 'Viaje eliminado correctamente' })
+            })
+        })
+    })
+})
 
 router.put('/viajes/:id', verificarToken, putViaje)
 router.delete('/viajes/:id', verificarToken, deleteViaje)
