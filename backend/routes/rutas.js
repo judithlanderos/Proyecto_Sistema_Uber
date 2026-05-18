@@ -88,7 +88,7 @@ router.get('/usuarios/lista', verificarToken, (req, res) => {
             u.fecha_registro,
             COUNT(m.id_metodo) AS metodos_pago
         FROM Usuario u
-        LEFT JOIN MetodoPago m ON u.id_usuario = m.Usuario_id_usuario
+        LEFT JOIN MetodoPago m ON u.id_usuario = m.id_usuario
         GROUP BY u.id_usuario
         ORDER BY u.id_usuario DESC
     `
