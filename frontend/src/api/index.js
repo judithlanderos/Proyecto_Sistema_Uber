@@ -11,3 +11,4 @@ export const apiPost = (url, data) => axios.post(`${BASE_URL}${url}`, data, { he
 export const apiPut = (url, data) => axios.put(`${BASE_URL}${url}`, data, { headers: getHeaders() })
 export const apiDelete = (url) => axios.delete(`${BASE_URL}${url}`, { headers: getHeaders() })
 export const apiPostPublic = (url, data) => axios.post(`${BASE_URL}${url}`, data)
+

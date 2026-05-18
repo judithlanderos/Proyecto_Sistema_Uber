@@ -159,8 +159,9 @@ const subirFoto = async (e) => {
 
     try {
         const token = localStorage.getItem('token')
+        const BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:3000'
         const res = await axios.post(
-            `http://localhost:3000/api/usuarios/${usuario.value.id}/foto`,
+            `${BASE}/api/usuarios/${usuario.value.id}/foto`,
             formData,
             {
                 headers: {
