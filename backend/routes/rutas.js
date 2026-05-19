@@ -10,11 +10,25 @@ const {
 } = require('../controllers/controlador')
 
 const cloudinary = require('cloudinary').v2
-
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
+})
+
+const storage = multer.memoryStorage()
+
+const upload = multer({
+    storage,
+    limits: { fileSize: 2 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const tipos = ['image/jpeg', 'image/png', 'image/jpg']
+        if (tipos.includes(file.mimetype)) {
+            cb(null, true)
+        } else {
+            cb(new Error('Solo se permiten imagenes JPG y PNG'))
+        }
+    }
 })
 
 router.post('/registro', registro)
@@ -354,16 +368,24 @@ const upload = multer({
         }
     }
 })
-
 router.post('/usuarios/:id/foto', verificarToken, upload.single('foto'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No se subio ninguna imagen' })
 
     try {
-        const resultado = await cloudinary.uploader.upload(req.file.path, {
-            folder: 'sistemauber',
-            public_id: `usuario_${req.params.id}`,
-            overwrite: true,
-            transformation: [{ width: 200, height: 200, crop: 'fill' }]
+        const resultado = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                {
+                    folder: 'sistemauber',
+                    public_id: `usuario_${req.params.id}`,
+                    overwrite: true,
+                    transformation: [{ width: 200, height: 200, crop: 'fill' }]
+                },
+                (error, result) => {
+                    if (error) reject(error)
+                    else resolve(result)
+                }
+            )
+            stream.end(req.file.buffer)
         })
 
         const url = resultado.secure_url
@@ -373,7 +395,8 @@ router.post('/usuarios/:id/foto', verificarToken, upload.single('foto'), async (
             res.json({ mensaje: 'Foto actualizada correctamente', url })
         })
     } catch (err) {
-        res.status(500).json({ error: 'Error al subir imagen a Cloudinary' })
+        console.error('Error Cloudinary:', err)
+        res.status(500).json({ error: 'Error al subir imagen' })
     }
 })
 
