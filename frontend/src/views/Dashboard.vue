@@ -38,8 +38,8 @@
                     <div class="image" style="position:relative; cursor:pointer;" @click="triggerFoto">
                         <img
                             v-if="fotoPerfil"
-                            :src="'http://localhost:3000' + fotoPerfil"
-                            style="width:40px; height:40px; border-radius:50%; object-fit:cover;"
+                            :src="fotoPerfil"
+                            style="width:40px; height:40px; border-radius:50%; object-fit:cover; border: 2px solid #4ade80;"
                         />
                         <i v-else class="fas fa-user-circle fa-2x" style="color:#4ade80; padding-left:8px;"></i>
                         <input
