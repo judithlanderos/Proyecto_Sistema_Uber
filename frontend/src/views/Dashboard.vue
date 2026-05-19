@@ -103,6 +103,7 @@ import Viajes from './modulos/Viajes.vue'
 import Pagos from './modulos/Pagos.vue'
 import Calificaciones from './modulos/Calificaciones.vue'
 import axios from 'axios'
+import Inicio from './modulos/Inicio.vue'
 
 onMounted(() => {
      setTimeout(() => {
@@ -119,7 +120,7 @@ onMounted(() => {
 })
 const router = useRouter()
 const usuario = ref(JSON.parse(localStorage.getItem('usuario')))
-const moduloActivo = ref(markRaw(Viajes))
+const moduloActivo = ref(markRaw(Inicio))
 
 
 const menu = [

@@ -391,4 +391,61 @@ router.post('/usuarios/:id/foto', verificarToken, upload.single('foto'), async (
     }
 })
 
+router.get('/dashboard/estadisticas', verificarToken, (req, res) => {
+    const sqlConteos = `
+        SELECT
+            (SELECT COUNT(*) FROM Usuario) AS total_usuarios,
+            (SELECT COUNT(*) FROM Conductor) AS total_conductores,
+            (SELECT COUNT(*) FROM Viaje) AS total_viajes,
+            (SELECT COUNT(*) FROM Pago) AS total_pagos,
+            (SELECT IFNULL(SUM(monto), 0) FROM Pago) AS total_ingresos
+    `
+
+    const sqlEstados = `
+        SELECT estado, COUNT(*) AS cantidad
+        FROM Viaje
+        GROUP BY estado
+    `
+
+    const sqlUltimosViajes = `
+        SELECT 
+            v.id_viaje,
+            CONCAT(u.nombre, ' ', u.primer_ap) AS pasajero,
+            CONCAT(c.nombre, ' ', c.primer_ap) AS conductor,
+            v.origen,
+            v.destino,
+            v.estado,
+            v.monto_cobrado
+        FROM Viaje v
+        JOIN Usuario u ON v.Usuario_id_usuario = u.id_usuario
+        JOIN Conductor c ON v.Conductor_id_conductor = c.id_conductor
+        ORDER BY v.id_viaje DESC
+        LIMIT 5
+    `
+
+    const sqlCalificaciones = `
+        SELECT AVG(CAST(puntaje AS DECIMAL)) AS promedio_calificacion
+        FROM Calificacion
+    `
+
+    db.query(sqlConteos, (err, conteos) => {
+        if (err) return res.status(500).json({ error: err.message })
+        db.query(sqlEstados, (err, estados) => {
+            if (err) return res.status(500).json({ error: err.message })
+            db.query(sqlUltimosViajes, (err, ultimos) => {
+                if (err) return res.status(500).json({ error: err.message })
+                db.query(sqlCalificaciones, (err, calificaciones) => {
+                    if (err) return res.status(500).json({ error: err.message })
+                    res.json({
+                        conteos: conteos[0],
+                        estados,
+                        ultimos_viajes: ultimos,
+                        promedio_calificacion: calificaciones[0].promedio_calificacion || 0
+                    })
+                })
+            })
+        })
+    })
+})
+
 module.exports = router
