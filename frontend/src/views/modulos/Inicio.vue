@@ -56,7 +56,7 @@
                     <canvas ref="graficaEstados"></canvas>
                 </div>
             </div>
-            <div class="col-lg-6 mb-3 d-flex">
+            <div class="col-lg-6 mb-3 ">
                 <div class="grafica-card">
                     <h5 class="grafica-titulo">Calificacion Promedio</h5>
                     <div class="calificacion-centro">
