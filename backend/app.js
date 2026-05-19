@@ -18,6 +18,7 @@ app.use(cors({
         'http://localhost:5173',
         //'https://sistemauber-frontend.onrender.com'
         'https://proyecto-sistema-uber-1.onrender.com'
+        
     ],
     credentials: true
 }))

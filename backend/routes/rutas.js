@@ -9,6 +9,14 @@ const {
     getUsuarios, getConductores, getVehiculos, getConteos
 } = require('../controllers/controlador')
 
+const cloudinary = require('cloudinary').v2
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
+
 router.post('/registro', registro)
 router.post('/login', login)
 router.post('/logout', logout)
@@ -347,14 +355,26 @@ const upload = multer({
     }
 })
 
-router.post('/usuarios/:id/foto', verificarToken, upload.single('foto'), (req, res) => {
+router.post('/usuarios/:id/foto', verificarToken, upload.single('foto'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No se subio ninguna imagen' })
-    const url = `/uploads/${req.file.filename}`
-    const sql = 'UPDATE Usuario SET foto = ? WHERE id_usuario = ?'
-    db.query(sql, [url, req.params.id], (err) => {
-        if (err) return res.status(500).json({ error: err.message })
-        res.json({ mensaje: 'Foto actualizada correctamente', url })
-    })
+
+    try {
+        const resultado = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'sistemauber',
+            public_id: `usuario_${req.params.id}`,
+            overwrite: true,
+            transformation: [{ width: 200, height: 200, crop: 'fill' }]
+        })
+
+        const url = resultado.secure_url
+        const sql = 'UPDATE Usuario SET foto = ? WHERE id_usuario = ?'
+        db.query(sql, [url, req.params.id], (err) => {
+            if (err) return res.status(500).json({ error: err.message })
+            res.json({ mensaje: 'Foto actualizada correctamente', url })
+        })
+    } catch (err) {
+        res.status(500).json({ error: 'Error al subir imagen a Cloudinary' })
+    }
 })
 
 module.exports = router
