@@ -50,13 +50,13 @@
 
         <!-- GRAFICAS -->
         <div class="row mb-4">
-            <div class="col-lg-8 mb-3 d-flex">
+            <div class="col-lg-7 mb-3 d-flex">
                 <div class="grafica-card">
                     <h5 class="grafica-titulo">Viajes por Estado</h5>
                     <canvas ref="graficaEstados"></canvas>
                 </div>
             </div>
-            <div class="col-lg-4 mb-3 ">
+            <div class="col-lg-5 mb-3 ">
                 <div class="grafica-card">
                     <h5 class="grafica-titulo">Calificacion Promedio</h5>
                     <div class="calificacion-centro">
