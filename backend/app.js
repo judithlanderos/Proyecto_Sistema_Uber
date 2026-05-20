@@ -34,63 +34,26 @@ app.use(session({
     }
 }));
 
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const session = require('express-session');
-require('dotenv').config();
+// Permitir archivos uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-const db = require('./config/database');
-const rutas = require('./routes/rutas');
-
-const app = express();[[]]
-
-const path = require('path')
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-
-app.use(helmet());
-app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        //'https://sistemauber-frontend.onrender.com'
-        'https://proyecto-sistema-uber-1.onrender.com'
-        
-    ],
-    credentials: true
-}))
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(session({
-    secret: process.env.SESSION_SECRET || 'uber_secret_key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        secure: false,
-        maxAge: 30 * 60 * 1000
-    }
-}));
-
-app.use('/api/auth', rutas);
-app.use('/api', rutas);
-
-app.get('/', (req, res) => {
-    res.json({ mensaje: 'Backend SistemaUber funcionando' });
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
-
-// No permitir acceso a directorios
+// Bloquear acceso a otras rutas no permitidas
 app.use((req, res, next) => {
-    const rutasPermitidas = ['/api', '/uploads']
-    const permitida = rutasPermitidas.some(ruta => req.path.startsWith(ruta))
+    const rutasPermitidas = ['/api', '/uploads'];
+
+    const permitida = rutasPermitidas.some(ruta =>
+        req.path.startsWith(ruta)
+    );
+
     if (!permitida && req.path !== '/') {
-        return res.status(403).json({ error: 'Acceso denegado' })
+        return res.status(403).json({
+            error: 'Acceso denegado'
+        });
     }
-    next()
-})
+
+    next();
+});
+
 
 app.use('/api/auth', rutas);
 app.use('/api', rutas);
@@ -103,4 +66,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
-
