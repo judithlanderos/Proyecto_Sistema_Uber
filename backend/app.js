@@ -12,7 +12,13 @@ const app = express();[[]]
 const path = require('path')
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
-app.use(helmet());
+app.use(helmet({
+    noSniff: true,
+    xssFilter: true,
+    hidePoweredBy: true,
+    frameguard: { action: 'deny' }
+}))
+
 app.use(cors({
     origin: [
         'http://localhost:5173',
