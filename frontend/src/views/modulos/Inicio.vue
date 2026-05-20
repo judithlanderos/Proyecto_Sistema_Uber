@@ -226,7 +226,7 @@ onMounted(cargar)
     border-radius: 12px;
     padding: 24px;
     height: 100%;
-    min-height: 350px;
+    min-height: 400px;
 }
 
 .grafica-titulo {
