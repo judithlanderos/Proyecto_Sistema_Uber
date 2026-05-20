@@ -124,6 +124,7 @@ const moduloActivo = ref(markRaw(Inicio))
 
 
 const menu = [
+    { nombre: 'Dashboard',      componente: markRaw(Inicio),         icono: 'fas fa-home' },
     { nombre: 'Usuarios',       componente: markRaw(Usuarios),       icono: 'fas fa-users' },
     { nombre: 'Conductores',    componente: markRaw(Conductores),    icono: 'fas fa-id-card' },
     { nombre: 'Vehiculos',      componente: markRaw(Vehiculos),      icono: 'fas fa-car' },
