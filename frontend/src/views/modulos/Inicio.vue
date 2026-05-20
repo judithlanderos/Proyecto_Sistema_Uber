@@ -49,15 +49,17 @@
         </div>
 
         <!-- GRAFICAS -->
-        <div class="row mb-4">
-            <div class="col-lg-7 mb-3 d-flex">
-                <div class="grafica-card">
-                    <h5 class="grafica-titulo">Viajes por Estado</h5>
-                    <canvas ref="graficaEstados"></canvas>
+            <div class="row mb-4">
+                <div class="col-lg-6 mb-3">
+                    <div class="grafica-card" style="min-height: 0;">
+                        <h5 class="grafica-titulo">Viajes por Estado</h5>
+                        <div style="position:relative; height:250px; width:100%;">
+                            <canvas ref="graficaEstados"></canvas>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-5 mb-3 ">
-                <div class="grafica-card">
+                <div class="col-lg-6 mb-3">
+                    <div class="grafica-card" style="min-height: 0;">
                     <h5 class="grafica-titulo">Calificacion Promedio</h5>
                     <div class="calificacion-centro">
                         <div class="calificacion-numero">{{ Number(datos.promedio_calificacion).toFixed(1) }}</div>
@@ -226,7 +228,7 @@ onMounted(cargar)
     border-radius: 12px;
     padding: 24px;
     height: 100%;
-    min-height: 400px;
+  
 }
 
 .grafica-titulo {
