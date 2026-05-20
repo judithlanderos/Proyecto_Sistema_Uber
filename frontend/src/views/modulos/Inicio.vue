@@ -225,7 +225,6 @@ onMounted(cargar)
     border: 1px solid #2a2a2a;
     border-radius: 12px;
     padding: 24px;
-    width: 100%;
     height: 100%;
     min-height: 400px;
 }
