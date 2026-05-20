@@ -53,7 +53,7 @@
             <div class="col-lg-6 mb-3 d-flex">
                 <div class="grafica-card">
                     <h5 class="grafica-titulo">Viajes por Estado</h5>
-                    <canvas ref="graficaEstados" style="max-height: 280px; width: 100% !important"></canvas>
+                    <canvas ref="graficaEstados" style="max-height: 280px; width: 100% !important" ></canvas>
                 </div>
             </div>
             <div class="col-lg-6 mb-3 ">
@@ -169,6 +169,7 @@ const iniciarGrafica = () => {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     labels: { color: '#ffffff' }
