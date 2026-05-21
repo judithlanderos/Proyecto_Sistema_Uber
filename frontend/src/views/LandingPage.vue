@@ -121,6 +121,20 @@
     padding: 100px 20px;
     width: 100%;
     box-sizing: border-box;
+    position: relative;
+    isolation: isolate;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('/uber.jpeg');
+    background-size: cover;
+    background-position: center;
+    filter: blur(3px) brightness(0.25);
+    z-index: -1;
+    transform: scale(1.05);
 }
 
 .hero-titulo {
