@@ -29,37 +29,37 @@
             <div class="tarjetas">
 
                 <div class="tarjeta">
-                    <div class="icono">🧑‍💼</div>
+                    <div class="icono"><i class="fas fa-users"></i></div>
                     <h3>Gestion de Usuarios</h3>
                     <p>Registrate y administra pasajeros con su informacion completa y metodos de pago a utilizar.</p>
                 </div>
 
                 <div class="tarjeta">
-                    <div class="icono">🚗</div>
+                    <div class="icono"><i class="fas fa-car"></i></div>
                     <h3>Control de Conductores</h3>
                     <p>Gestiona conductores, sus vehiculos y calificaciones en tiempo real.</p>
                 </div>
 
                 <div class="tarjeta">
-                    <div class="icono">📍</div>
+                    <div class="icono"><i class="fas fa-map-marker-alt"></i></div>
                     <h3>Seguimiento de Viajes</h3>
                     <p>Registra origen, destino, distancia, estado y monto de cada viaje.</p>
                 </div>
 
                 <div class="tarjeta">
-                    <div class="icono">💳</div>
+                    <div class="icono"><i class="fas fa-credit-card"></i></div>
                     <h3>Gestion de Pagos</h3>
                     <p>Controla los pagos generados por cada viaje completado.</p>
                 </div>
 
                 <div class="tarjeta">
-                    <div class="icono">⭐</div>
+                    <div class="icono"><i class="fas fa-star"></i></div>
                     <h3>Sistema de Calificaciones</h3>
                     <p>Usuarios y conductores pueden calificarse mutuamente al finalizar el viaje.</p>
                 </div>
 
                 <div class="tarjeta">
-                    <div class="icono">🔒</div>
+                    <div class="icono"><i class="fas fa-shield-alt"></i></div>
                     <h3>Acceso Seguro</h3>
                     <p>Sistema con autenticacion, sesiones protegidas y cifrado de contrasenas.</p>
                 </div>
@@ -183,7 +183,15 @@
 }
 
 .icono {
-    font-size: 36px;
+width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background-color: #1f1f1f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #4ade80;
     margin-bottom: 16px;
 }
 
