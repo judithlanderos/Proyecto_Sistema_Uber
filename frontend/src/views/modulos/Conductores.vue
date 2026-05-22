@@ -51,6 +51,7 @@
 import { ref, onMounted } from 'vue'
 import ConductorModal from '../../components/conductores/ConductorModal.vue'
 import { getConductores, eliminarConductor } from '../../services/conductoresService'
+import { alertaExito, alertaError, alertaConfirmar } from '../../utils/alertas'
 
 const conductores = ref([])
 const modalVisible = ref(false)
@@ -75,13 +76,33 @@ const abrirEditar = (c) => {
     modalVisible.value = true
 }
 
-const eliminar = async (id) => {
-    if (!confirm('Seguro que deseas eliminar este conductor?')) return
+const guardar = async () => {
+    errorGeneral.value = ''
+    if (!formularioValido()) return
     try {
-        await eliminarConductor(id)
+        if (modoEditar.value) {
+            await apiPut(`/conductores/${idEditando.value}`, form.value)
+            alertaExito('Conductor actualizado correctamente')
+        } else {
+            await apiPost('/conductores/crear', form.value)
+            alertaExito('Conductor creado correctamente')
+        }
         await cargar()
+        setTimeout(() => cerrarModal(), 1000)
     } catch (err) {
-        alert('Error al eliminar conductor')
+        alertaError(err.response?.data?.error || 'Error al guardar')
+    }
+}
+
+const eliminar = async (id) => {
+    const resultado = await alertaConfirmar('Seguro que deseas eliminar este conductor?')
+    if (!resultado.isConfirmed) return
+    try {
+        await apiDelete(`/conductores/${id}`)
+        await cargar()
+        alertaExito('Conductor eliminado correctamente')
+    } catch (err) {
+        alertaError('Error al eliminar conductor')
     }
 }
 

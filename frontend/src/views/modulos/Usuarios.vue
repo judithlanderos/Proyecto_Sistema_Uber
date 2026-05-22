@@ -90,6 +90,7 @@
 import { ref, onMounted } from 'vue'
 import { apiGet, apiPost, apiPut, apiDelete } from '../../api/index'
 import { validarNombre, validarApellido, validarCorreo, validarTelefono } from '../../utils/validaciones'
+import { alertaExito, alertaError, alertaConfirmar } from '../../utils/alertas'
 
 const usuarios = ref([])
 const modalVisible = ref(false)
@@ -153,30 +154,31 @@ const cerrarModal = () => { modalVisible.value = false }
 
 const guardar = async () => {
     errorGeneral.value = ''
-    exito.value = ''
     if (!formularioValido()) return
     try {
         if (modoEditar.value) {
             await apiPut(`/usuarios/${idEditando.value}`, form.value)
-            exito.value = 'Usuario actualizado correctamente'
+            alertaExito('Usuario actualizado correctamente')
         } else {
             await apiPost('/usuarios/crear', form.value)
-            exito.value = 'Usuario creado correctamente'
+            alertaExito('Usuario creado correctamente')
         }
         await cargar()
         setTimeout(() => cerrarModal(), 1000)
     } catch (err) {
-        errorGeneral.value = err.response?.data?.error || 'Error al guardar'
+        alertaError(err.response?.data?.error || 'Error al guardar')
     }
 }
 
 const eliminar = async (id) => {
-    if (!confirm('Seguro que deseas eliminar este usuario?')) return
+    const resultado = await alertaConfirmar('Seguro que deseas eliminar este usuario?')
+    if (!resultado.isConfirmed) return
     try {
         await apiDelete(`/usuarios/${id}`)
         await cargar()
+        alertaExito('Usuario eliminado correctamente')
     } catch (err) {
-        alert('Error al eliminar usuario')
+        alertaError('Error al eliminar usuario')
     }
 }
 

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import router from '../router'
+import { alertaSesionExpirada } from '../utils/alertas'
 
 const BASE_URL =  import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
@@ -26,6 +27,20 @@ api.interceptors.response.use(
             localStorage.removeItem('usuario')
             alert('Tu sesion ha expirado. Por favor vuelve a iniciar sesion.')
             router.push('/login')
+        }
+        return Promise.reject(error)
+    }
+)
+
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token')
+            localStorage.removeItem('usuario')
+            alertaSesionExpirada()
+            setTimeout(() => router.push('/login'), 3000)
         }
         return Promise.reject(error)
     }

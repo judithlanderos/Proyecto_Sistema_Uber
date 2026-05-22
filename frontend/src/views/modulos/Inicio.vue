@@ -78,7 +78,7 @@
                 <div class="grafica-card">
                     <h5 class="grafica-titulo">Ultimos 5 Viajes</h5>
                     <div class="tabla-contenedor">
-                        <table class="tabla">
+                        <table ref="tablaViajes" class="tabla display nowrap" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -112,9 +112,13 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import { apiGet } from '../../api/index'
+import {onBeforeUnmount } from 'vue'
 
 const graficaEstados = ref(null)
 let chartInstance = null
+const tablaViajes = ref(null)
+let dtInstance = null
+
 
 const datos = ref({
     conteos: {
@@ -135,6 +139,7 @@ const cargar = async () => {
         datos.value = res.data
         await nextTick()
         iniciarGrafica()
+        iniciarDataTable()
     } catch (err) {
         console.error('Error cargando estadisticas', err)
     }
@@ -180,6 +185,20 @@ const iniciarGrafica = () => {
         }
     })
 }
+
+const iniciarDataTable = () => {
+    if (dtInstance) { dtInstance.destroy(); dtInstance = null }
+    dtInstance = window.$(tablaViajes.value).DataTable({
+        language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
+        order: [[0, 'desc']],
+        pageLength: 5,
+        lengthChange: false,
+        responsive: true
+    })
+}
+onBeforeUnmount(() => {
+    if (dtInstance) { dtInstance.destroy(); dtInstance = null }
+})
 
 onMounted(cargar)
 </script>
@@ -293,4 +312,42 @@ onMounted(cargar)
     .kpi-numero { font-size: 22px; }
     .calificacion-numero { font-size: 52px; }
 }
+
+:deep(.dataTables_wrapper) { color: #ffffff; font-size: 14px; }
+:deep(.dataTables_length label), :deep(.dataTables_filter label) { color: #a0a0a0; }
+:deep(.dataTables_length select), :deep(.dataTables_filter input) {
+    background-color: #1f1f1f;
+    border: 1px solid #2a2a2a;
+    color: #ffffff;
+    border-radius: 6px;
+    padding: 5px 10px;
+    outline: none;
+}
+:deep(.dataTables_filter input:focus) { border-color: #4ade80; }
+:deep(.dataTables_info) { color: #a0a0a0; font-size: 13px; }
+:deep(.dataTables_paginate .paginate_button) {
+    background-color: #1f1f1f !important;
+    border: 1px solid #2a2a2a !important;
+    color: #a0a0a0 !important;
+    border-radius: 6px;
+    margin: 2px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+:deep(.dataTables_paginate .paginate_button:hover) {
+    background-color: #2a2a2a !important;
+    color: #ffffff !important;
+    border-color: #4ade80 !important;
+}
+:deep(.dataTables_paginate .paginate_button.current) {
+    background-color: #4ade80 !important;
+    color: #0a0a0a !important;
+    border-color: #4ade80 !important;
+    font-weight: 700;
+}
+:deep(table.dataTable thead th) {
+    background-color: #1f1f1f;
+    color: #4ade80;
+}
+
 </style>

@@ -104,6 +104,7 @@ import Pagos from './modulos/Pagos.vue'
 import Calificaciones from './modulos/Calificaciones.vue'
 import axios from 'axios'
 import Inicio from './modulos/Inicio.vue'
+import { alertaExito, alertaError } from '../utils/alertas'
 
 onMounted(() => {
      setTimeout(() => {
@@ -174,7 +175,7 @@ const subirFoto = async (e) => {
         )
         fotoPerfil.value = res.data.url
     } catch (err) {
-        alert('Error al subir la foto')
+        alertaError('Error al subir la foto')
     }
 }
 
