@@ -70,6 +70,7 @@
 import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import ViajeDetalleModal from '@/components/viajes/ViajeDetalleModal.vue'
 import { getViajes, getViajeDetalle, deleteViaje, getUsuarios, getConductores, getVehiculos } from '@/services/viajeService'
+import { alertaExito, alertaError, alertaConfirmar } from '../../utils/alertas'
 
 const tablaRef = ref(null)
 let dtInstance = null
@@ -167,12 +168,14 @@ const cerrarModal = () => {
 }
 
 const eliminar = async (id) => {
-    if (!confirm('Seguro que deseas eliminar este viaje?')) return
+    const resultado = await alertaConfirmar('Seguro que deseas eliminar este viaje?')
+    if (!resultado.isConfirmed) return
     try {
         await deleteViaje(id)
         await cargarViajes()
+        alertaExito('Viaje eliminado correctamente')
     } catch (err) {
-        alert('Error al eliminar viaje')
+        alertaError('Error al eliminar viaje')
     }
 }
 

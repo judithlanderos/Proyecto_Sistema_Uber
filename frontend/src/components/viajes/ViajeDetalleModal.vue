@@ -145,6 +145,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { postViaje, putViaje } from '../../services/viajeService'
+import { alertaExito, alertaError } from '../../utils/alertas'
 
 const props = defineProps({
     tipo: String,
@@ -218,15 +219,15 @@ const guardar = async () => {
     try {
         if (props.modoEditar) {
             await putViaje(props.viajeEditar.id_viaje, form.value)
-            exito.value = 'Viaje actualizado correctamente'
+            alertaExito('Viaje actualizado correctamente')
         } else {
             await postViaje(form.value)
-            exito.value = 'Viaje agregado correctamente'
+            alertaExito('Viaje agregado correctamente')
         }
         emit('guardado')
         setTimeout(() => emit('cerrar'), 1000)
     } catch (err) {
-        errorGeneral.value = err.response?.data?.error || 'Error al guardar'
+        alertaError(err.response?.data?.error || 'Error al guardar')
     }
 }
 </script>
