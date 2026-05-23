@@ -31,15 +31,7 @@ const editarViaje = (datos, callback) => {
     console.log('DATOS RECIBIDOS:', datos)
 
     const sql = `
-        UPDATE Viaje 
-        SET 
-            origen = ?,
-            destino = ?,
-            estado = ?,
-            monto_cobrado = ?,
-            distancia_km = ?
-        WHERE id_viaje = ?
-    `
+        'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, distancia_km = ? WHERE id_viaje = ?'
 
     db.query(sql, datos, (err, result) => {
 
