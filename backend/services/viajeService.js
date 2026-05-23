@@ -5,13 +5,19 @@ const listarViajes = (callback) => {
 }
 
 const crearViaje = (datos, callback) => {
-    const { id_usuario, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, estado, monto_cobrado } = datos
-    viajeModel.agregarViaje([id_usuario, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, estado, monto_cobrado], callback)
+    const { id_usuario, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, estado, monto_cobrado, distancia_km  } = datos
+    viajeModel.agregarViaje(
+            [id_usuario, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, estado, monto_cobrado, distancia_km || null],
+            callback
+        )
 }
 
 const actualizarViaje = (id, datos, callback) => {
     const { origen, destino, estado, monto_cobrado } = datos
-    viajeModel.editarViaje([origen, destino, estado, monto_cobrado, id], callback)
+    viajeModel.editarViaje(
+            [origen, destino, estado, monto_cobrado, distancia_km || null, id],
+            callback
+    )
 }
 
 const borrarViaje = (id, callback) => {
