@@ -156,7 +156,8 @@ onMounted(() => {
         }
     }, 500)
         eventos.forEach(evento => {
-        window.addEventListener(evento, reiniciarTemporizador)
+        window.addEventListener(evento, reiniciarTemporizador) 
+        
     })
     reiniciarTemporizador()
 })
