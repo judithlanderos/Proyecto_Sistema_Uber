@@ -28,5 +28,8 @@ const editarPago = (id, datos, callback) => {
 const eliminarPago = (id, callback) => {
     db.query('DELETE FROM Pago WHERE id_pago = ?', [id], callback)
 }
+const eliminarPorViaje = (id_viaje, callback) => {
+    db.query('DELETE FROM Pago WHERE Viaje_id_viaje = ?', [id_viaje], callback)
+}
 
-module.exports = { obtenerPagos, crearPago, editarPago, eliminarPago }
+module.exports = { obtenerPagos, crearPago, editarPago, eliminarPago, eliminarPorViaje }

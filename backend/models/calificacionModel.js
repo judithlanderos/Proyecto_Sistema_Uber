@@ -29,5 +29,7 @@ const editarCalificacion = (id, datos, callback) => {
 const eliminarCalificacion = (id, callback) => {
     db.query('DELETE FROM Calificacion WHERE id_calificacion = ?', [id], callback)
 }
-
-module.exports = { obtenerCalificaciones, crearCalificacion, editarCalificacion, eliminarCalificacion }
+const eliminarPorViaje = (id_viaje, callback) => {
+    db.query('DELETE FROM Calificacion WHERE Viaje_id_viaje = ?', [id_viaje], callback)
+}
+module.exports = { obtenerCalificaciones, crearCalificacion, editarCalificacion, eliminarCalificacion, eliminarPorViaje }
