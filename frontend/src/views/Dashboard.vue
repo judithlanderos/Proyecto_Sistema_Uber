@@ -104,7 +104,38 @@ import Pagos from './modulos/Pagos.vue'
 import Calificaciones from './modulos/Calificaciones.vue'
 import axios from 'axios'
 import Inicio from './modulos/Inicio.vue'
-import { alertaExito, alertaError } from '../utils/alertas'
+import { alertaExito, alertaError, alertaSesionExpirada } from '../utils/alertas'
+import { onBeforeUnmount } from 'vue'
+
+let temporizador = null
+const TIEMPO_INACTIVIDAD = 2 * 60 * 1000
+const cerrarSesionInactividad = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('usuario')
+
+    alertaSesionExpirada()
+
+    setTimeout(() => {
+        router.push('/login')
+    }, 3000)
+}
+
+const reiniciarTemporizador = () => {
+    clearTimeout(temporizador)
+    temporizador = setTimeout(
+        cerrarSesionInactividad,
+        TIEMPO_INACTIVIDAD
+    )
+}
+
+const eventos = [
+    'mousemove',
+    'mousedown',
+    'keypress',
+    'scroll',
+    'touchstart',
+    'click'
+]
 
 onMounted(() => {
      setTimeout(() => {
@@ -118,7 +149,19 @@ onMounted(() => {
             })
         }
     }, 500)
+        eventos.forEach(evento => {
+        window.addEventListener(evento, reiniciarTemporizador)
+    })
+    reiniciarTemporizador()
 })
+
+onBeforeUnmount(() => {
+    clearTimeout(temporizador)
+    eventos.forEach(evento => {
+        window.removeEventListener(evento, reiniciarTemporizador)
+    })
+})
+
 const router = useRouter()
 const usuario = ref(JSON.parse(localStorage.getItem('usuario')))
 const moduloActivo = ref(markRaw(Inicio))
@@ -178,6 +221,7 @@ const subirFoto = async (e) => {
         alertaError('Error al subir la foto')
     }
 }
+
 
 </script>
 

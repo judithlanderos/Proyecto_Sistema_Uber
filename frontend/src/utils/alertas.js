@@ -59,6 +59,8 @@ export const alertaSesionExpirada = () => {
         text: 'Por favor vuelve a iniciar sesion',
         timer: 3000,
         timerProgressBar: true,
-        showConfirmButton: false
+        showConfirmButton: false,
+        allowOutsideClick: false
+
     })
 }

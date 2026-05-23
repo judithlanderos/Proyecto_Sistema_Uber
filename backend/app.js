@@ -36,11 +36,10 @@ app.use(session({
     saveUninitialized: false,
     cookie: {
         secure: false,
-        maxAge: 30 * 60 * 1000
+        maxAge: 1 * 60 * 1000
     }
 }));
 
-// Permitir archivos uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Bloquear acceso a otras rutas no permitidas
