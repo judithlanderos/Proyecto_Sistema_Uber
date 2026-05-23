@@ -52,3 +52,14 @@ export const validarRequerido = (valor, campo) => {
     if (!valor) return `${campo} es obligatorio`
     return ''
 }
+
+export const validarDistancia = (valor) => {
+    if (!valor) return ''
+    if (!regexMonto.test(valor)) return 'Distancia invalida, ejemplo: 10.50'
+    return ''
+}
+
+export const validarSeleccion = (valor, campo) => {
+    if (!valor) return `Selecciona ${campo}`
+    return ''
+}

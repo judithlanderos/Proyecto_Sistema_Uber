@@ -157,7 +157,7 @@ const abrirDetalle = async (id) => {
         tipoModal.value = 'detalle'
         modalVisible.value = true
     } catch (err) {
-        alert('Error al cargar detalle')
+        alertError('Error al cargar detalle')
     }
 }
 
