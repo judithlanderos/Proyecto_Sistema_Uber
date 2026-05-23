@@ -61,8 +61,5 @@ export const alertaSesionExpirada = () => {
         timerProgressBar: true,
         showConfirmButton: false,
         allowOutsideClick: false
-
-    }).then(() => {
-        router.push('/login')
     })
 }
