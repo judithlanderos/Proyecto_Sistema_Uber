@@ -106,6 +106,7 @@ import axios from 'axios'
 import Inicio from './modulos/Inicio.vue'
 import { alertaExito, alertaError, alertaSesionExpirada } from '../utils/alertas'
 import { onBeforeUnmount } from 'vue'
+const router = useRouter()
 
 let temporizador = null
 const TIEMPO_INACTIVIDAD = 2 * 60 * 1000
@@ -114,14 +115,9 @@ const cerrarSesionInactividad = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('usuario')
 
-    router.push('/login').then(() => {
-
-    alertaSesionExpirada()
-    })
-
-    setTimeout(() => {
+    alertaSesionExpirada().then(() => {
         router.push('/login')
-    }, 3000)
+    })
 }
 
 const reiniciarTemporizador = () => {
@@ -172,7 +168,6 @@ onBeforeUnmount(() => {
     })
 })
 
-const router = useRouter()
 const usuario = ref(JSON.parse(localStorage.getItem('usuario')))
 const moduloActivo = ref(markRaw(Inicio))
 
