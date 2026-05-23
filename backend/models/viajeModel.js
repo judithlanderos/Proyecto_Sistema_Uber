@@ -26,12 +26,21 @@ const agregarViaje = (datos, callback) => {
     const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, fecha_salida, estado, monto_cobrado, distancia_km) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
     db.query(sql, datos, callback)
 }
+
 const editarViaje = (datos, callback) => {
 
     console.log('DATOS RECIBIDOS:', datos)
 
     const sql = `
-        'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, distancia_km = ? WHERE id_viaje = ?'
+        UPDATE Viaje 
+        SET 
+            origen = ?, 
+            destino = ?, 
+            estado = ?, 
+            monto_cobrado = ?, 
+            distancia_km = ?
+        WHERE id_viaje = ?
+    `
 
     db.query(sql, datos, (err, result) => {
 
