@@ -28,7 +28,7 @@ const agregarViaje = (datos, callback) => {
 }
 
 const editarViaje = (datos, callback) => {
-    const sql = 'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, distancia_km = ?  WHERE id_viaje = ?'
+    const sql = 'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, fecha_salida = ?, fecha_inicio = ?, fecha_fin = ?, distancia_km = ? WHERE id_viaje = ?'
     db.query(sql, datos, callback)
 }
 
