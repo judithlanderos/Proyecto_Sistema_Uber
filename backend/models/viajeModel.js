@@ -29,7 +29,11 @@ const agregarViaje = (datos, callback) => {
 
 const editarViaje = (datos, callback) => {
     const sql = 'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, fecha_salida = ?, fecha_inicio = ?, fecha_fin = ?, distancia_km = ? WHERE id_viaje = ?'
-    db.query(sql, datos, callback)
+    console.log('SQL EDITAR - datos:', datos)
+    db.query(sql, datos, (err, result) => {
+        if (err) console.log('ERROR SQL EDITAR:', err)
+            callback(err, result)
+    })  
 }
 const eliminarViaje = (id, callback) => {
     const sql = 'DELETE FROM Viaje WHERE id_viaje = ?'
