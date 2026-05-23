@@ -246,10 +246,13 @@ const guardar = async () => {
         distancia_km: form.value.distancia_km !== '' ? form.value.distancia_km : null
     }
 
+    console.log('PAYLOAD QUE SE MANDA:', payload)
+    console.log('distancia_km:', payload.distancia_km) 
+
 
     try {
         if (props.modoEditar) {
-            await putViaje(props.viajeEditar.id_viaje, form.value)
+            await putViaje(props.viajeEditar.id_viaje, payload)
             alertaExito('Viaje actualizado correctamente')
         } else {
             await postViaje(form.value)
