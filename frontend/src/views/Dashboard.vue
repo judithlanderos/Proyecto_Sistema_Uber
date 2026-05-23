@@ -122,7 +122,7 @@ const cerrarSesionInactividad = () => {
 
 const reiniciarTemporizador = () => {
     clearTimeout(temporizador.value)
-    temporizador = setTimeout(
+    temporizador.value = setTimeout(
         cerrarSesionInactividad,
         TIEMPO_INACTIVIDAD
     )
@@ -157,7 +157,7 @@ onMounted(() => {
     }, 500)
         eventos.forEach(evento => {
         window.addEventListener(evento, reiniciarTemporizador) 
-        
+
     })
     reiniciarTemporizador()
 })
