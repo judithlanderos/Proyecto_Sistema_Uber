@@ -110,10 +110,14 @@ import { onBeforeUnmount } from 'vue'
 let temporizador = null
 const TIEMPO_INACTIVIDAD = 2 * 60 * 1000
 const cerrarSesionInactividad = () => {
+    clearTimeout(temporizador)
     localStorage.removeItem('token')
     localStorage.removeItem('usuario')
 
+    router.push('/login').then(() => {
+
     alertaSesionExpirada()
+    })
 
     setTimeout(() => {
         router.push('/login')
@@ -138,6 +142,12 @@ const eventos = [
 ]
 
 onMounted(() => {
+        const token = localStorage.getItem('token')
+    if (!token) {
+        router.push('/login')
+        return
+    }
+
      setTimeout(() => {
         if (window.AdminLTE) {
             window.AdminLTE.init()

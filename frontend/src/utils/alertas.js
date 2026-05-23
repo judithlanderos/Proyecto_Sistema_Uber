@@ -52,6 +52,10 @@ export const alertaConfirmar = (mensaje) => {
 }
 
 export const alertaSesionExpirada = () => {
+     clearTimeout(temporizador)
+    localStorage.removeItem('token')
+    localStorage.removeItem('usuario')
+
     Swal.fire({
         ...estilos,
         icon: 'warning',
@@ -62,5 +66,7 @@ export const alertaSesionExpirada = () => {
         showConfirmButton: false,
         allowOutsideClick: false
 
+    }).then(() => {
+        router.push('/login')
     })
 }
