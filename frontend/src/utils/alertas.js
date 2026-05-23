@@ -52,7 +52,7 @@ export const alertaConfirmar = (mensaje) => {
 }
 
 export const alertaSesionExpirada = () => {
-     clearTimeout(temporizador)
+     clearTimeout(temporizador.value)
     localStorage.removeItem('token')
     localStorage.removeItem('usuario')
 
