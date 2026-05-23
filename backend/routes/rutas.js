@@ -108,7 +108,7 @@ router.get('/viajes/detalle/:id', verificarToken, (req, res) => {
     })
 })
 router.post('/viajes', verificarToken, postViaje)
-router.put('/viajes/:id', verificarToken, putViaje)
+
 router.delete('/viajes/:id', verificarToken, (req, res) => {
     const id = req.params.id
     calificacionModel.eliminarPorViaje(id, (err) => {

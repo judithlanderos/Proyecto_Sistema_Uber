@@ -13,12 +13,22 @@ const crearViaje = (datos, callback) => {
 }
 
 const actualizarViaje = (id, datos, callback) => {
-    const { origen, destino, estado, monto_cobrado,  distancia_km } = datos
-    const distancia = distancia_km !== null && distancia_km !== '' ? parseFloat(distancia_km) : null
-    const monto = monto_cobrado !== null && monto_cobrado !== '' ? parseFloat(monto_cobrado) : null
+
+    const { origen, destino, estado, monto_cobrado, distancia_km } = datos
+
+    const monto = monto_cobrado !== null && monto_cobrado !== ''
+        ? parseFloat(monto_cobrado)
+        : null
+
+    const distancia = distancia_km !== null && distancia_km !== ''
+        ? parseFloat(distancia_km)
+        : null
+
+    console.log('ID:', id)
+
     viajeModel.editarViaje(
-            [origen, destino, estado, monto_cobrado, distancia_km || null, id],
-            callback
+        [origen, destino, estado, monto, distancia, id],
+        callback
     )
 }
 

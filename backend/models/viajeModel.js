@@ -26,15 +26,36 @@ const agregarViaje = (datos, callback) => {
     const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, fecha_salida, estado, monto_cobrado, distancia_km) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
     db.query(sql, datos, callback)
 }
-
 const editarViaje = (datos, callback) => {
-    const sql = 'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, fecha_salida = ?, fecha_inicio = ?, fecha_fin = ?, distancia_km = ? WHERE id_viaje = ?'
-    console.log('SQL EDITAR - datos:', datos)
+
+    console.log('DATOS RECIBIDOS:', datos)
+
+    const sql = `
+        UPDATE Viaje 
+        SET 
+            origen = ?,
+            destino = ?,
+            estado = ?,
+            monto_cobrado = ?,
+            distancia_km = ?
+        WHERE id_viaje = ?
+    `
+
     db.query(sql, datos, (err, result) => {
-        if (err) console.log('ERROR SQL EDITAR:', err)
-            callback(err, result)
-    })  
+
+        if (err) {
+            console.log('ERROR MYSQL COMPLETO:')
+            console.log(err)
+
+            return callback(err, null)
+        }
+
+        console.log('UPDATE OK')
+
+        callback(null, result)
+    })
 }
+
 const eliminarViaje = (id, callback) => {
     const sql = 'DELETE FROM Viaje WHERE id_viaje = ?'
     db.query(sql, [id], callback)
