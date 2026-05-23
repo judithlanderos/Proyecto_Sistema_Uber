@@ -108,7 +108,7 @@ import { alertaExito, alertaError, alertaSesionExpirada } from '../utils/alertas
 import { onBeforeUnmount } from 'vue'
 
 let temporizador = null
-const TIEMPO_INACTIVIDAD = 2 * 60 * 1000
+const TIEMPO_INACTIVIDAD = 5 * 60 * 1000
 const cerrarSesionInactividad = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('usuario')
