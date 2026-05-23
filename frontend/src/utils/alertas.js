@@ -52,11 +52,7 @@ export const alertaConfirmar = (mensaje) => {
 }
 
 export const alertaSesionExpirada = () => {
-     clearTimeout(temporizador.value)
-    localStorage.removeItem('token')
-    localStorage.removeItem('usuario')
-
-    Swal.fire({
+    return Swal.fire({
         ...estilos,
         icon: 'warning',
         title: 'Sesion expirada',
