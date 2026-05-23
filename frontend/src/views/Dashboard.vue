@@ -108,10 +108,10 @@ import { alertaExito, alertaError, alertaSesionExpirada } from '../utils/alertas
 import { onBeforeUnmount } from 'vue'
 const router = useRouter()
 
-let temporizador = null
+const temporizador = ref(null)
 const TIEMPO_INACTIVIDAD = 2 * 60 * 1000
 const cerrarSesionInactividad = () => {
-    clearTimeout(temporizador)
+    clearTimeout(temporizador.value)
     localStorage.removeItem('token')
     localStorage.removeItem('usuario')
 
@@ -121,7 +121,7 @@ const cerrarSesionInactividad = () => {
 }
 
 const reiniciarTemporizador = () => {
-    clearTimeout(temporizador)
+    clearTimeout(temporizador.value)
     temporizador = setTimeout(
         cerrarSesionInactividad,
         TIEMPO_INACTIVIDAD
@@ -162,7 +162,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-    clearTimeout(temporizador)
+    clearTimeout(temporizador.value)
     eventos.forEach(evento => {
         window.removeEventListener(evento, reiniciarTemporizador)
     })
