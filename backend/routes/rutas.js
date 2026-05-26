@@ -134,7 +134,7 @@ router.get('/usuarios/lista', verificarToken, (req, res) => {
 router.post('/usuarios/crear', verificarToken, (req, res) => {
     const { nombre, primer_ap, segundo_ap, correo, telefono } = req.body
     const fecha = new Date().toISOString().slice(0, 10)
-    const passwordDefault = require('bcryptjs').hashSync('123456', 10)
+    const passwordDefault = require('bcryptjs').hashSync(req.body.password || '123456', 10)
     const sql = 'INSERT INTO Usuario (nombre, primer_ap, segundo_ap, correo, telefono, fecha_registro, password) VALUES (?, ?, ?, ?, ?, ?, ?)'
     db.query(sql, [nombre, primer_ap, segundo_ap, correo, telefono, fecha, passwordDefault], (err) => {
         if (err) return res.status(500).json({ error: err.message })
@@ -208,6 +208,20 @@ router.get('/vehiculos/lista', verificarToken, (req, res) => {
         res.json(results)
     })
 })
+router.post('/vehiculos/crear', verificarToken, (req, res) => {
+    vehiculoModel.crearVehiculo(req.body, (err) => {
+        if (err) return res.status(500).json({ error: err.message })
+        res.status(201).json({ mensaje: 'Vehículo creado correctamente' })
+    })
+})
+router.get('/vehiculos/:id', verificarToken, (req, res) => {
+    vehiculoModel.obtenerVehiculoDetalle(req.params.id, (err, results) => {
+        if (err) return res.status(500).json({ error: err.message })
+        if (results.length === 0) return res.status(404).json({ error: 'Vehículo no encontrado' })
+        res.json(results[0])
+    })
+})
+
 router.put('/vehiculos/:id', verificarToken, (req, res) => {
     vehiculoModel.editarVehiculo(req.params.id, req.body, (err) => {
             if (err) return res.status(500).json({ error: err.message })

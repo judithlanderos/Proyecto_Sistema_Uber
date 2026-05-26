@@ -32,9 +32,7 @@
                         <td>{{ u.fecha_registro }}</td>
                         <td><span class="badge-metodos">{{ u.metodos_pago }}</span></td>
                         <td>
-                            <button class="btn-accion ver btn-ver" :data-id="u.id_usuario">
-                                <i class="fas fa-eye"></i>
-                            </button>
+
                             <button class="btn-accion editar btn-editar" :data-id="u.id_usuario">
                                 <i class="fas fa-edit"></i>
                             </button>
@@ -83,7 +81,11 @@
                     <input v-model="form.telefono" type="text" placeholder="10 digitos" maxlength="10" @input="manejarTelefono" />
                     <span class="error-campo" v-if="errores.telefono">{{ errores.telefono }}</span>
                 </div>
-
+                <div class="campo" v-if="!modoEditar">
+                    <label>Contrasena</label>
+                    <input v-model="form.password" type="password" placeholder="Minimo 6 caracteres" @input="errores.password = validarPassword(form.password)" />
+                    <span class="error-campo" v-if="errores.password">{{ errores.password }}</span>
+                </div>
                 <p v-if="errorGeneral" class="error-general">{{ errorGeneral }}</p>
                 <p v-if="exito" class="exito">{{ exito }}</p>
 
@@ -101,7 +103,7 @@
 <script setup>
 import { ref, onMounted, nextTick, onBeforeUnmount  } from 'vue'
 import { apiGet, apiPost, apiPut, apiDelete } from '../../api/index'
-import { validarNombre, validarApellido, validarCorreo, validarTelefono } from '../../utils/validaciones'
+import { validarNombre, validarApellido, validarCorreo, validarTelefono, validarPassword  } from '../../utils/validaciones'
 import { alertaExito, alertaError, alertaConfirmar } from '../../utils/alertas'
 
 const usuarios = ref([])
@@ -114,11 +116,11 @@ const tablaRef = ref(null)
 let dtInstance = null
 
 const form = ref({
-    nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: ''
+    nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: ''
 })
 
 const errores = ref({
-    nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: ''
+    nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: ''
 })
 
 const iniciarDataTable = () => {
@@ -173,14 +175,17 @@ const formularioValido = () => {
     errores.value.segundo_ap = validarApellido(form.value.segundo_ap, false)
     errores.value.correo = validarCorreo(form.value.correo)
     errores.value.telefono = validarTelefono(form.value.telefono)
+    if (!modoEditar.value) {
+    errores.value.password = validarPassword(form.value.password)
+}
     return !Object.values(errores.value).some(e => e !== '')
 }
 
 const abrirModalAgregar = () => {
     modoEditar.value = false
     idEditando.value = null
-    form.value = { nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '' }
-    errores.value = { nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '' }
+    form.value = { nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: '' }
+    errores.value = { nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: '' }
     errorGeneral.value = ''
     exito.value = ''
     modalVisible.value = true
@@ -335,7 +340,6 @@ onBeforeUnmount(() => {
     font-size: 13px;
     transition: opacity 0.2s;
 }
-.btn-accion.ver     { background-color: #14532d; color: #4ade80; }
 .btn-accion.editar { background-color: #1e3a8a; color: #93c5fd; }
 .btn-accion.eliminar { background-color: #7f1d1d; color: #fca5a5; }
 .btn-accion:hover { opacity: 0.8; }

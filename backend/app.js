@@ -7,7 +7,7 @@ require('dotenv').config();
 const db = require('./config/database');
 const rutas = require('./routes/rutas');
 
-const app = express();[[]]
+const app = express();
 
 const path = require('path')
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
