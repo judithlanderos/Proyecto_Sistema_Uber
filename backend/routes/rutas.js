@@ -236,6 +236,20 @@ router.delete('/vehiculos/:id', verificarToken, (req, res) => {
 })
 
 // PAGOS
+router.get('/pagos/viajes-completados', verificarToken, (req, res) => {
+    pagoModel.obtenerViajesCompletados((err, results) => {
+        if (err) return res.status(500).json({ error: err.message })
+        res.json(results)
+    })
+})
+
+router.get('/pagos/metodos', verificarToken, (req, res) => {
+    pagoModel.obtenerMetodosPago((err, results) => {
+        if (err) return res.status(500).json({ error: err.message })
+        res.json(results)
+    })
+})
+
 router.get('/pagos/lista', verificarToken, (req, res) => {
         pagoModel.obtenerPagos((err, results) => {
         if (err) return res.status(500).json({ error: err.message })
