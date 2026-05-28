@@ -3,7 +3,8 @@ const db = require('../config/database')
 const obtenerUsuarios = (callback) => {
     const sql = `
         SELECT u.id_usuario, u.nombre, u.primer_ap, u.segundo_ap, u.correo, u.telefono,
-            u.fecha_registro, COUNT(m.id_metodo) AS metodos_pago
+            u.fecha_registro, 
+            GROUP_CONCAT(m.tipo SEPARATOR ', ') AS metodo_tipo
         FROM Usuario u
         LEFT JOIN MetodoPago m ON u.id_usuario = m.id_usuario
         GROUP BY u.id_usuario ORDER BY u.id_usuario DESC

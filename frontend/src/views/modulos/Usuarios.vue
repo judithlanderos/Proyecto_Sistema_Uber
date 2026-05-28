@@ -30,7 +30,7 @@
                         <td>{{ u.correo }}</td>
                         <td>{{ u.telefono }}</td>
                         <td>{{ u.fecha_registro }}</td>
-                        <td><span class="badge-metodos">{{ u.metodos_pago }}</span></td>
+                        <td><span class="badge-metodos">{{ u.metodo_tipo || 'Sin métodos' }}</span></td>
                         <td>
 
                             <button class="btn-accion editar btn-editar" :data-id="u.id_usuario">

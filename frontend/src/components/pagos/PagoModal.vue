@@ -8,7 +8,7 @@
             <div class="campo">
                 <label>Viaje (solo completados)</label>
                 <select v-model="form.id_viaje" @change="errores.id_viaje = validarSeleccion(form.id_viaje, 'un viaje')">
-                    <option value="">-- Selecciona un viaje --</option>
+                    <option value="">- Selecciona un viaje -</option>
                     <option v-for="v in viajes" :key="v.id_viaje" :value="v.id_viaje">
                         #{{ v.id_viaje }} — {{ v.origen }} → {{ v.destino }}
                     </option>
