@@ -5,7 +5,7 @@
                 {{ modoEditar ? 'Editar Pago' : 'Agregar Pago' }}
             </h4>
 
-            <div class="campo" v-if="!modoEditar">
+            <div class="campo">
                 <label>Viaje (solo completados)</label>
                 <select v-model="form.id_viaje" @change="errores.id_viaje = validarSeleccion(form.id_viaje, 'un viaje')">
                     <option value="">-- Selecciona un viaje --</option>
