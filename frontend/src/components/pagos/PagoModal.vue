@@ -16,7 +16,7 @@
                 <span class="error-campo" v-if="errores.id_viaje">{{ errores.id_viaje }}</span>
             </div>
 
-            <div class="campo" v-if="!modoEditar">
+            <div class="campo">
                 <label>Metodo de Pago</label>
                 <select v-model="form.id_metodo" @change="errores.id_metodo = validarSeleccion(form.id_metodo, 'un metodo')">
                     <option value="">- Selecciona metodo -</option>
