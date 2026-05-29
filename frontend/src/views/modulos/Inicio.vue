@@ -3,7 +3,7 @@
         <!-- TARJETAS KPI -->
         <div class="row mb-4">
             <div class="col-lg-3 col-6 mb-3">
-                <div class="kpi-card">
+                <div class="kpi-card" style="cursor:pointer" @click="emit('navegarA', 'Usuarios')">
                     <div class="kpi-icono" style="background-color:#14532d;">
                         <i class="fas fa-users" style="color:#4ade80;"></i>
                     </div>
@@ -14,7 +14,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-6 mb-3">
-                <div class="kpi-card">
+                <div class="kpi-card" style="cursor:pointer" @click="emit('navegarA', 'Conductores')">
                     <div class="kpi-icono" style="background-color:#1e3a8a;">
                         <i class="fas fa-id-card" style="color:#93c5fd;"></i>
                     </div>
@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-6 mb-3">
-                <div class="kpi-card">
+                <div class="kpi-card"style="cursor:pointer" @click="emit('navegarA', 'Viajes')">
                     <div class="kpi-icono" style="background-color:#854d0e;">
                         <i class="fas fa-car" style="color:#fef08a;"></i>
                     </div>
@@ -36,7 +36,7 @@
                 </div>
             </div>
             <div class="col-lg-3 col-6 mb-3">
-                <div class="kpi-card">
+                <div class="kpi-card" style="cursor:pointer" @click="emit('navegarA', 'Pagos')">
                     <div class="kpi-icono" style="background-color:#7f1d1d;">
                         <i class="fas fa-dollar-sign" style="color:#fca5a5;"></i>
                     </div>
@@ -118,6 +118,7 @@ const graficaEstados = ref(null)
 let chartInstance = null
 const tablaViajes = ref(null)
 let dtInstance = null
+const emit = defineEmits(['navegarA'])
 
 
 const datos = ref({
@@ -184,6 +185,10 @@ const iniciarGrafica = () => {
             }
         }
     })
+}
+const irAModulo = (nombre) => {
+    const item = menu.find(m => m.nombre === nombre)
+    if (item) moduloActivo.value = item.componente
 }
 
 const iniciarDataTable = () => {

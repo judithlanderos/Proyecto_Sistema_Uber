@@ -84,7 +84,7 @@
 
             <div class="content">
                 <div class="container-fluid">
-                    <component :is="moduloActivo" />
+                    <component :is="moduloActivo" @navegarA="irAModulo"/>
                 </div>
             </div>
         </div>
@@ -228,7 +228,10 @@ const subirFoto = async (e) => {
     }
 }
 
-
+const irAModulo = (nombre) => {
+    const item = menu.find(m => m.nombre === nombre)
+    if (item) moduloActivo.value = item.componente
+}
 </script>
 
 <style scoped>
