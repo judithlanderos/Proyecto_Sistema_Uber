@@ -5,7 +5,7 @@
                 {{ modoEditar ? 'Editar Pago' : 'Agregar Pago' }}
             </h4>
 
-            <div class="campo">
+            <div class="campo" v-if="!modoEditar">
                 <label>Viaje (solo completados)</label>
                 <select v-model="form.id_viaje" @change="errores.id_viaje = validarSeleccion(form.id_viaje, 'un viaje')">
                     <option value="">- Selecciona un viaje -</option>
@@ -21,7 +21,7 @@
                 <select v-model="form.id_metodo" @change="errores.id_metodo = validarSeleccion(form.id_metodo, 'un metodo')">
                     <option value="">- Selecciona metodo -</option>
                     <option v-for="m in metodos" :key="m.id_metodo" :value="m.id_metodo">
-                        {{ m.usuario }} — {{ m.tipo }} {{ m.detalle ? '(' + m.detalle + ')' : '' }}
+                        {{ m.tipo }}{{ m.detalle ? ' (' + m.detalle + ')' : '' }}
                     </option>
                 </select>
                 <span class="error-campo" v-if="errores.id_metodo">{{ errores.id_metodo }}</span>
@@ -74,10 +74,21 @@ const cargarDesplegables = async () => {
     } catch { viajes.value = []; metodos.value = [] }
 }
 
+// Normaliza la fecha que viene del backend (puede traer hora: "2026-04-01T06:00:00.000Z")
+const normalizarFecha = (fecha) => {
+    if (!fecha) return ''
+    return fecha.toString().substring(0, 10)
+}
+
 watch(() => props.pago, (p) => {
     if (p) {
         modoEditar.value = true
-        form.value = { monto: p.monto, fecha_transaccion: p.fecha_transaccion, id_metodo: p.MetodoPago_id_metodo || '' }
+        form.value = {
+            id_viaje: '',                                        // no se edita
+            id_metodo: p.MetodoPago_id_metodo ?? p.id_metodo ?? '',
+            monto: p.monto ?? '',
+            fecha_transaccion: normalizarFecha(p.fecha_transaccion)
+        }
     } else {
         modoEditar.value = false
         form.value = { id_viaje: '', id_metodo: '', monto: '', fecha_transaccion: '' }
@@ -90,11 +101,13 @@ cargarDesplegables()
 
 const formularioValido = () => {
     if (!modoEditar.value) {
-        errores.value.id_viaje = validarSeleccion(form.value.id_viaje, 'un viaje')
+        errores.value.id_viaje  = validarSeleccion(form.value.id_viaje,  'un viaje')
         errores.value.id_metodo = validarSeleccion(form.value.id_metodo, 'un metodo')
+    } else {
+        errores.value.id_viaje  = ''
         errores.value.id_metodo = validarSeleccion(form.value.id_metodo, 'un metodo')
     }
-    errores.value.monto = validarMonto(form.value.monto) || (!form.value.monto ? 'El monto es obligatorio' : '')
+    errores.value.monto            = validarMonto(form.value.monto) || (String(form.value.monto).trim() === '' ? 'El monto es obligatorio' : '')
     errores.value.fecha_transaccion = validarFecha(form.value.fecha_transaccion)
     return !Object.values(errores.value).some(e => e !== '')
 }
@@ -104,7 +117,11 @@ const guardar = async () => {
     if (!formularioValido()) return
     try {
         if (modoEditar.value) {
-            await actualizarPago(props.pago.id_pago, form.value)
+            await actualizarPago(props.pago.id_pago, {
+                monto:             form.value.monto,
+                fecha_transaccion: form.value.fecha_transaccion,
+                id_metodo:         form.value.id_metodo
+            })
             alertaExito('Pago actualizado correctamente')
         } else {
             await crearPago(form.value)
@@ -114,6 +131,7 @@ const guardar = async () => {
         setTimeout(() => emit('cerrar'), 1000)
     } catch (err) {
         alertaError(err.response?.data?.error || 'Error al guardar')
+        errorGeneral.value = err.response?.data?.error || 'Error al guardar'
     }
 }
 </script>

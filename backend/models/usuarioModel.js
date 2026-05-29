@@ -35,5 +35,13 @@ const actualizarFoto = (id, url, callback) => {
 const buscarPorCorreo = (correo, callback) => {
     db.query('SELECT * FROM Usuario WHERE correo = ?', [correo], callback)
 }
+const crearMetodoPago = (datos, callback) => {
+    const { id_usuario, tipo, detalle } = datos
+    db.query(
+        'INSERT INTO MetodoPago (id_usuario, tipo, detalle, activo) VALUES (?, ?, ?, 1)',
+        [id_usuario, tipo, detalle || null],
+        callback
+    )
+}
 
-module.exports = { obtenerUsuarios, crearUsuario, editarUsuario, eliminarUsuario, actualizarFoto, buscarPorCorreo }
+module.exports = { obtenerUsuarios, crearUsuario, editarUsuario, eliminarUsuario, actualizarFoto, buscarPorCorreo, crearMetodoPago }

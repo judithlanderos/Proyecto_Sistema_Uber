@@ -86,6 +86,35 @@
                     <input v-model="form.password" type="password" placeholder="Minimo 6 caracteres" @input="errores.password = validarPassword(form.password)" />
                     <span class="error-campo" v-if="errores.password">{{ errores.password }}</span>
                 </div>
+                <div v-if="!modoEditar">
+                    <div class="seccion-titulo">
+                        <span>Métodos de Pago</span>
+                        <span class="opcional">(opcional)</span>
+                    </div>
+
+                    <div v-for="(m, i) in metodosPago" :key="i" class="metodo-item">
+                        <div class="metodo-info">
+                            <span class="badge-metodo-tipo">{{ m.tipo }}</span>
+                        </div>
+                        <button class="btn-quitar" @click="quitarMetodo(i)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <div class="campo">
+                        <select v-model="nuevoMetodo.tipo">
+                            <option value="">- Selecciona método -</option>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="tarjeta">Tarjeta</option>
+                            <option value="saldo_uber">Saldo Uber</option>
+                        </select>
+                        <span class="error-campo" v-if="errores.metodoTipo">{{ errores.metodoTipo }}</span>
+                    </div>
+
+                    <button class="btn-verde-sm" @click="confirmarMetodo">
+                        <i class="fas fa-plus"></i> Agregar
+                    </button>
+                </div>
                 <p v-if="errorGeneral" class="error-general">{{ errorGeneral }}</p>
                 <p v-if="exito" class="exito">{{ exito }}</p>
 
@@ -114,13 +143,14 @@ const exito = ref('')
 const idEditando = ref(null)
 const tablaRef = ref(null)
 let dtInstance = null
-
+const metodosPago = ref([])
+const nuevoMetodo = ref({ tipo: '' })
 const form = ref({
     nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: ''
 })
 
 const errores = ref({
-    nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: ''
+    nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: '',  metodoTipo: ''
 })
 
 const iniciarDataTable = () => {
@@ -185,7 +215,9 @@ const abrirModalAgregar = () => {
     modoEditar.value = false
     idEditando.value = null
     form.value = { nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: '' }
-    errores.value = { nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: '' }
+    errores.value = { nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '', password: '', metodoTipo: '' }
+    metodosPago.value = [] 
+    nuevoMetodo.value = { tipo: '' }
     errorGeneral.value = ''
     exito.value = ''
     modalVisible.value = true
@@ -196,13 +228,17 @@ const abrirModalEditar = (u) => {
     idEditando.value = u.id_usuario
     form.value = { nombre: u.nombre, primer_ap: u.primer_ap, segundo_ap: u.segundo_ap || '', correo: u.correo, telefono: u.telefono }
     errores.value = { nombre: '', primer_ap: '', segundo_ap: '', correo: '', telefono: '' }
+    metodosPago.value = []
+    nuevoMetodo.value = { tipo: '' }
     errorGeneral.value = ''
     exito.value = ''
     modalVisible.value = true
 }
 
 const cerrarModal = () => { modalVisible.value = false }
-
+const quitarMetodo = (i) => {
+    metodosPago.value.splice(i, 1)
+}
 const guardar = async () => {
     errorGeneral.value = ''
     if (!formularioValido()) return
@@ -211,8 +247,14 @@ const guardar = async () => {
             await apiPut(`/usuarios/${idEditando.value}`, form.value)
             alertaExito('Usuario actualizado correctamente')
         } else {
-            await apiPost('/usuarios/crear', form.value)
-            alertaExito('Usuario creado correctamente')
+        const res = await apiPost('/usuarios/crear', form.value)
+        console.log('response crear:', res.data)
+        const nuevoId = res.data.id
+        console.log('nuevoId:', nuevoId)
+        for (const m of metodosPago.value) {
+            await apiPost(`/usuarios/${nuevoId}/metodos`, m)
+    }
+    alertaExito('Usuario creado correctamente')
         }
         await cargar()
         setTimeout(() => cerrarModal(), 1000)
@@ -232,7 +274,15 @@ const eliminar = async (id) => {
         alertaError('Error al eliminar usuario')
     }
 }
-
+const confirmarMetodo = () => {
+    if (!nuevoMetodo.value.tipo) {
+        errores.value.metodoTipo = 'Selecciona un tipo'
+        return
+    }
+    metodosPago.value.push({ tipo: nuevoMetodo.value.tipo, detalle: null })
+    nuevoMetodo.value = { tipo: '' }
+    errores.value.metodoTipo = ''
+}
 onMounted(cargar)
 onBeforeUnmount(() => {
     if (dtInstance) {
@@ -410,6 +460,85 @@ onBeforeUnmount(() => {
 }
 
 .btn-cancelar:hover { background-color: #2a2a2a; color: #ffffff; }
+.seccion-titulo {
+    color: #a0a0a0;
+    font-size: 13px;
+    margin-bottom: 12px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-top: 1px solid #2a2a2a;
+    padding-top: 16px;
+}
+
+.metodo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+}
+
+.metodo-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge-metodo-tipo {
+    background-color: #14532d;
+    color: #4ade80;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.btn-quitar {
+    background: none;
+    border: none;
+    color: #f87171;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+.btn-quitar:hover { background-color: #7f1d1d33; }
+
+.campo select {
+    width: 100%;
+    padding: 10px 14px;
+    background-color: #1f1f1f;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+    box-sizing: border-box;
+}
+.campo select:focus { border-color: #4ade80; }
+.campo select option { background-color: #1f1f1f; }
+
+.btn-verde-sm {
+    background-color: #4ade80;
+    color: #0a0a0a;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background-color 0.2s;
+}
+.btn-verde-sm:hover { background-color: #22c55e; }
 
 @media (max-width: 768px) {
     .tabla th, .tabla td { padding: 10px 8px; font-size: 12px; }

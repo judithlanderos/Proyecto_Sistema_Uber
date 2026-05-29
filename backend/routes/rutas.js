@@ -136,9 +136,9 @@ router.post('/usuarios/crear', verificarToken, (req, res) => {
     const fecha = new Date().toISOString().slice(0, 10)
     const passwordDefault = require('bcryptjs').hashSync(req.body.password || '123456', 10)
     const sql = 'INSERT INTO Usuario (nombre, primer_ap, segundo_ap, correo, telefono, fecha_registro, password) VALUES (?, ?, ?, ?, ?, ?, ?)'
-    db.query(sql, [nombre, primer_ap, segundo_ap, correo, telefono, fecha, passwordDefault], (err) => {
+    db.query(sql, [nombre, primer_ap, segundo_ap, correo, telefono, fecha, passwordDefault], (err, result) => {
         if (err) return res.status(500).json({ error: err.message })
-        res.status(201).json({ mensaje: 'Usuario creado correctamente' })
+        res.status(201).json({ mensaje: 'Usuario creado correctamente', id: result.insertId  })
     })
 })
 router.put('/usuarios/:id', verificarToken, (req, res) => {
@@ -171,6 +171,17 @@ router.post('/usuarios/:id/foto', verificarToken, upload.single('foto'), async (
     } catch (err) {
         res.status(500).json({ error: 'Error al subir imagen' })
     }
+})
+router.post('/usuarios/:id/metodos', verificarToken, (req, res) => {
+    const { tipo, detalle } = req.body
+    if (!tipo) return res.status(400).json({ error: 'El tipo es obligatorio' })
+    usuarioModel.crearMetodoPago(
+        { id_usuario: req.params.id, tipo, detalle },
+        (err) => {
+            if (err) return res.status(500).json({ error: 'Error al crear método de pago' })
+            res.json({ mensaje: 'Método de pago creado' })
+        }
+    )
 })
 
 // CONDUCTORES
