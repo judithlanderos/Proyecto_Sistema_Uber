@@ -3,6 +3,7 @@ import Landing from '../views/LandingPage.vue'
 import Login from '../views/Login.vue'
 import Registro from '../views/Registro.vue'
 import Dashboard from '../views/Dashboard.vue'
+import PasajeroDashboard from '../views/PasajeroDashboard.vue'
 import NotFound from '../views/NotFound.vue'
 
 const router = createRouter({
@@ -12,6 +13,7 @@ const router = createRouter({
         { path: '/login', component: Login },
         { path: '/registro', component: Registro },
         { path: '/dashboard', component: Dashboard, meta: { requiereAuth: true } },
+        { path: '/pasajero', component: PasajeroDashboard},
         { path: '/:pathMatch(.*)*', component: NotFound }
     ]
 })

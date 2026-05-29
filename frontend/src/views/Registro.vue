@@ -59,7 +59,16 @@
                 />
                 <span class="error-campo" v-if="errores.telefono">{{ errores.telefono }}</span>
             </div>
-
+            <div class="campo">
+                <label>Rol</label>
+                <select
+                    v-model="form.rol"
+                    class="select-rol"
+                >
+                    <option value="pasajero">Pasajero</option>
+                    <option value="admin">Administrador</option>
+                </select>
+            </div>
             <div class="campo">
                 <label>Contrasena</label>
                 <input
@@ -127,7 +136,8 @@ const form = ref({
     segundo_ap: '',
     correo: '',
     telefono: '',
-    password: ''
+    password: '',
+    rol: ''
 })
 
 const errores = ref({
@@ -170,7 +180,8 @@ const registrar = async () => {
         const res = await loginService(form.value.correo, form.value.password)
         localStorage.setItem('token', res.data.token)
         localStorage.setItem('usuario', JSON.stringify(res.data.usuario))
-        setTimeout(() => router.push('/dashboard'), 1500)
+        const rol = res.data.usuario.rol
+        setTimeout(() => router.push(rol === 'admin' ? '/dashboard' : '/pasajero'), 1500)    
     } catch (err) {
         errorGeneral.value = err.response?.data?.error || 'Error al registrar'
     } finally {
@@ -303,6 +314,22 @@ const registrar = async () => {
 }
 
 .enlace a:hover { text-decoration: underline; }
+
+.select-rol {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: #1f1f1f;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 15px;
+    outline: none;
+    transition: border 0.3s;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.select-rol:focus { border-color: #4ade80; }
+.select-rol option { background-color: #1f1f1f; }
 
 @media (max-width: 480px) {
     .tarjeta { padding: 24px 16px; }

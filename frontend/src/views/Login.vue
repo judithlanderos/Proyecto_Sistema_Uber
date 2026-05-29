@@ -98,7 +98,8 @@ const iniciarSesion = async () => {
         const res = await loginService(correo.value, password.value)
         localStorage.setItem('token', res.data.token)
         localStorage.setItem('usuario', JSON.stringify(res.data.usuario))
-        router.push('/dashboard')
+        const rol = res.data.usuario.rol
+        router.push(rol === 'admin' ? '/dashboard' : '/pasajero')
     } catch (err) {
         errorGeneral.value = err.response?.data?.error || 'Error al iniciar sesion'
     } finally {

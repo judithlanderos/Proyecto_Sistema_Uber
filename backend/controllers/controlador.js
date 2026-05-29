@@ -5,7 +5,7 @@ const viajeService = require('../services/viajeService')
 require('dotenv').config()
 
 const registro = (req, res) => {
-    const { nombre, primer_ap, segundo_ap, correo, telefono, password } = req.body
+    const { nombre, primer_ap, segundo_ap, correo, telefono, password, rol } = req.body
     if (!nombre || !primer_ap || !correo || !telefono || !password) {
         return res.status(400).json({ error: 'Todos los campos son obligatorios' })
     }
@@ -15,8 +15,9 @@ const registro = (req, res) => {
         if (results.length > 0) return res.status(400).json({ error: 'El correo ya esta registrado' })
         const hash = bcrypt.hashSync(password, 10)
         const fecha = new Date().toISOString().slice(0, 10)
-        const sql = 'INSERT INTO Usuario (nombre, primer_ap, segundo_ap, correo, telefono, fecha_registro, password) VALUES (?, ?, ?, ?, ?, ?, ?)'
-        db.query(sql, [nombre, primer_ap, segundo_ap, correo, telefono, fecha, hash], (err) => {
+        const rolFinal = rol === 'admin' ? 'admin' : 'pasajero'
+        const sql = 'INSERT INTO Usuario (nombre, primer_ap, segundo_ap, correo, telefono, fecha_registro, password, rol) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        db.query(sql, [nombre, primer_ap, segundo_ap, correo, telefono, fecha, hash, rolFinal], (err) => {
             if (err) return res.status(500).json({ error: 'Error al registrar usuario' })
             res.status(201).json({ mensaje: 'Usuario registrado correctamente' })
         })
@@ -34,7 +35,7 @@ const login = (req, res) => {
         const passwordValida = bcrypt.compareSync(password, usuario.password)
         if (!passwordValida) return res.status(401).json({ error: 'Correo o contrasena incorrectos' })
         const token = jwt.sign(
-            { id: usuario.id_usuario, correo: usuario.correo },
+            { id: usuario.id_usuario, correo: usuario.correo, rol: usuario.rol },
             process.env.JWT_SECRET,
             { expiresIn: '30m' }
         )
@@ -42,7 +43,7 @@ const login = (req, res) => {
         res.json({
             mensaje: 'Login exitoso',
             token,
-            usuario: { id: usuario.id_usuario, nombre: usuario.nombre, primer_ap: usuario.primer_ap, correo: usuario.correo }
+            usuario: { id: usuario.id_usuario, nombre: usuario.nombre, primer_ap: usuario.primer_ap, correo: usuario.correo, rol: usuario.rol }
         })
     })
 }
