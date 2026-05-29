@@ -102,7 +102,7 @@
                     </div>
 
                     <div class="campo">
-                        <select v-model="nuevoMetodo.tipo">
+                        <select v-model="nuevoMetodo.tipo"  @change="confirmarMetodo">
                             <option value="">- Selecciona método -</option>
                             <option value="efectivo">Efectivo</option>
                             <option value="tarjeta">Tarjeta</option>
@@ -111,9 +111,7 @@
                         <span class="error-campo" v-if="errores.metodoTipo">{{ errores.metodoTipo }}</span>
                     </div>
 
-                    <button class="btn-verde-sm" @click="confirmarMetodo">
-                        <i class="fas fa-plus"></i> Agregar
-                    </button>
+        
                 </div>
                 <p v-if="errorGeneral" class="error-general">{{ errorGeneral }}</p>
                 <p v-if="exito" class="exito">{{ exito }}</p>
@@ -251,8 +249,22 @@ const guardar = async () => {
         console.log('response crear:', res.data)
         const nuevoId = res.data.id
         console.log('nuevoId:', nuevoId)
+        console.log('response completo:', res.data)
         for (const m of metodosPago.value) {
-            await apiPost(`/usuarios/${nuevoId}/metodos`, m)
+            //await apiPost(`/usuarios/${nuevoId}/metodos`, { tipo: m.tipo, detalle: m.detalle || null })
+            console.log('Enviando metodo:', m)
+
+        const resp = await apiPost(
+            `/usuarios/${nuevoId}/metodos`,
+            {
+                tipo: m.tipo,
+                detalle: m.detalle || null
+            }
+        )
+
+        console.log('RESPUESTA METODO:', resp.data)
+
+
     }
     alertaExito('Usuario creado correctamente')
         }
@@ -275,12 +287,29 @@ const eliminar = async (id) => {
     }
 }
 const confirmarMetodo = () => {
+
     if (!nuevoMetodo.value.tipo) {
         errores.value.metodoTipo = 'Selecciona un tipo'
         return
     }
-    metodosPago.value.push({ tipo: nuevoMetodo.value.tipo, detalle: null })
+
+    const existe = metodosPago.value.some(
+        m => m.tipo === nuevoMetodo.value.tipo
+    )
+
+    if (existe) {
+        errores.value.metodoTipo = 'Ese método ya fue agregado'
+        nuevoMetodo.value = { tipo: '' }
+        return
+    }
+
+    metodosPago.value.push({
+        tipo: nuevoMetodo.value.tipo,
+        detalle: null
+    })
+
     nuevoMetodo.value = { tipo: '' }
+
     errores.value.metodoTipo = ''
 }
 onMounted(cargar)
