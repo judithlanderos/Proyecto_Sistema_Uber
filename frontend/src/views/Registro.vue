@@ -181,7 +181,10 @@ const registrar = async () => {
         localStorage.setItem('token', res.data.token)
         localStorage.setItem('usuario', JSON.stringify(res.data.usuario))
         const rol = res.data.usuario.rol
-        setTimeout(() => router.push(rol === 'admin' ? '/dashboard' : '/pasajero'), 1500)    
+    
+        const rolLimpio = res.data.usuario.rol?.trim().toLowerCase()
+        localStorage.setItem('rol', rolLimpio)
+        setTimeout(() => router.push(rolLimpio === 'admin' ? '/dashboard' : '/pasajero'), 1500)    
     } catch (err) {
         errorGeneral.value = err.response?.data?.error || 'Error al registrar'
     } finally {
