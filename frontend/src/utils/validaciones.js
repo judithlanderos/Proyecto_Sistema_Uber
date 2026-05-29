@@ -3,6 +3,7 @@ const soloNumeros = /^[0-9]*$/
 const regexCorreo = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/
 const regexMonto =  /^(?!0+(\.0{1,2})?$)\d+(\.\d{1,2})?$/
 const regexFecha = /^\d{4}-\d{2}-\d{2}$/
+const regexLugar  = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ][a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s,.\-#]*$/
 
 export const validarNombre = (valor) => {
     const v = (valor ?? '').trim()
@@ -74,5 +75,26 @@ export const validarDistancia = (valor) => {
 
 export const validarSeleccion = (valor, campo) => {
     if (!valor) return `Selecciona ${campo}`
+    return ''
+}
+export const validarOrigen = (valor) => {
+    const raw = valor ?? ''
+    const v = raw.trim()
+    if (!v || /^\s+$/.test(raw)) return 'El origen es obligatorio.'
+    if (/^\d/.test(v)) return 'El origen debe comenzar con una letra, no con un número.'
+    if (!regexLugar.test(v)) return 'El origen no puede contener símbolos especiales.'
+    if (v.length < 3) return 'El origen debe tener al menos 3 caracteres.'
+    if (v.length > 100) return 'El origen no puede exceder 100 caracteres.'
+    return ''
+}
+ 
+export const validarDestino = (valor) => {
+    const raw = valor ?? ''
+    const v = raw.trim()
+    if (!v || /^\s+$/.test(raw)) return 'El destino es obligatorio.'
+    if (/^\d/.test(v)) return 'El destino debe comenzar con una letra, no con un número.'
+    if (!regexLugar.test(v)) return 'El destino no puede contener símbolos especiales.'
+    if (v.length < 3) return 'El destino debe tener al menos 3 caracteres.'
+    if (v.length > 100) return 'El destino no puede exceder 100 caracteres.'
     return ''
 }

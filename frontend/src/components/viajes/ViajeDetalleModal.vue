@@ -151,7 +151,7 @@
 import { ref, watch } from 'vue'
 import { postViaje, putViaje } from '../../services/viajeService'
 import { alertaExito, alertaError } from '../../utils/alertas'
-import { validarMonto, validarFecha, validarRequerido, validarDistancia, validarSeleccion } from '../../utils/validaciones'
+import { validarMonto, validarFecha, validarRequerido, validarDistancia, validarSeleccion, validarOrigen, validarDestino } from '../../utils/validaciones'
 
 const props = defineProps({
     tipo: String,
@@ -208,8 +208,8 @@ const actualizarFechas = () => {
 }
 
 const validarCampo = (campo) => {
-    if (campo === 'origen') errores.value.origen = validarRequerido(form.value.origen, 'El origen')
-    if (campo === 'destino') errores.value.destino = validarRequerido(form.value.destino, 'El destino')
+    if (campo === 'origen') errores.value.origen = validarOrigen(form.value.origen, 'El origen')
+    if (campo === 'destino') errores.value.destino = validarDestino(form.value.destino, 'El destino')
     if (campo === 'monto') errores.value.monto_cobrado = validarMonto(form.value.monto_cobrado)
     if (campo === 'fecha') errores.value.fecha_solicitud = validarFecha(form.value.fecha_solicitud)
     if (campo === 'distancia') errores.value.distancia_km = form.value.distancia_km ? validarDistancia(form.value.distancia_km) : ''
