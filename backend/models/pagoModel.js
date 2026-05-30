@@ -2,7 +2,8 @@ const db = require('../config/database')
 
 const obtenerPagos = (callback) => {
     const sql = `
-        SELECT p.id_pago, p.monto, p.fecha_transaccion,
+        SELECT p.id_pago, p.monto,
+            DATE_FORMAT(p.fecha_transaccion, '%Y-%m-%d') AS fecha_transaccion,
             CONCAT(u.nombre, ' ', u.primer_ap) AS pasajero,
             v.origen, v.destino, v.estado,
             m.tipo AS metodo_tipo
