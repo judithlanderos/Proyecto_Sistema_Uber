@@ -16,15 +16,16 @@ const obtenerPagos = (callback) => {
 }
 
 const crearPago = (datos, callback) => {
-    const { id_viaje, monto, fecha_transaccion, id_metodo } = datos
-    db.query('INSERT INTO Pago (Viaje_id_viaje, monto, fecha_transaccion, MetodoPago_id_metodo) VALUES (?, ?, ?, ?)',
-        [id_viaje, monto, fecha_transaccion, id_metodo], callback)
+    const { id_viaje, monto, id_metodo } = datos
+    console.log(id_viaje, monto, id_metodo)
+    db.query('INSERT INTO Pago (Viaje_id_viaje, monto, MetodoPago_id_metodo) VALUES (?, ?, ?)',
+        [id_viaje, monto, id_metodo], callback)
 }
 
 const editarPago = (id, datos, callback) => {
-    const { monto, fecha_transaccion, id_metodo } = datos
-    db.query('UPDATE Pago SET monto = ?, fecha_transaccion = ?, MetodoPago_id_metodo = ? WHERE id_pago = ?',
-        [monto, fecha_transaccion, id_metodo, id], callback)
+    const { monto, id_metodo } = datos
+    db.query('UPDATE Pago SET monto = ?, MetodoPago_id_metodo = ? WHERE id_pago = ?',
+        [monto, id_metodo, id], callback)
 }
 
 const eliminarPago = (id, callback) => {

@@ -22,7 +22,7 @@
                         <td>{{ p.destino }}</td>
                         <td><span class="badge-metodo">{{ p.metodo_tipo }}</span></td>
                         <td>${{ p.monto }}</td>
-                        <td>{{ p.fecha_transaccion }}</td>
+                        <td>{{ formatearFecha(p.fecha_transaccion) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -37,6 +37,10 @@ import { apiGet } from '../../api/index'
 const tablaRef = ref(null)
 let dtInstance = null
 const pagos = ref([])
+const formatearFecha = (fecha) => {
+    if (!fecha) return ''
+    return new Date(fecha).toLocaleDateString('es-MX')
+}
 
 const iniciarDataTable = () => {
     if (dtInstance) { dtInstance.destroy(); dtInstance = null }
