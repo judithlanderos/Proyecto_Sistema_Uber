@@ -11,7 +11,7 @@ const obtenerViajes = (callback) => {
             v.destino,
             v.estado,
             v.monto_cobrado,
-            v.fecha_salida,
+            DATE_FORMAT(v.fecha_salida, '%d/%m/%Y %H:%i') AS fecha_salida,
             v.distancia_km
         FROM Viaje v
         JOIN Usuario u ON v.Usuario_id_usuario = u.id_usuario
@@ -23,7 +23,7 @@ const obtenerViajes = (callback) => {
 }
 
 const agregarViaje = (datos, callback) => {
-    const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, fecha_salida, estado, monto_cobrado, distancia_km) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, fecha_salida, estado, monto_cobrado, distancia_km) VALUES (?, ?, ?, ?, ?,  NOW(), ?, ?, ?)'
     db.query(sql, datos, callback)
 }
 

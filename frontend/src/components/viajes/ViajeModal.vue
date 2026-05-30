@@ -73,13 +73,6 @@
                 <span class="error-campo" v-if="errores.monto_cobrado">{{ errores.monto_cobrado }}</span>
             </div>
 
-            <div class="campo" v-if="!modoEditar">
-                <label>Fecha Solicitud</label>
-                <input v-model="form.fecha_solicitud" type="text" placeholder="2024-01-01"
-                    @input="() => errores.fecha_solicitud = validarFecha(form.fecha_solicitud)" />
-                <span class="error-campo" v-if="errores.fecha_solicitud">{{ errores.fecha_solicitud }}</span>
-            </div>
-
             <p v-if="errorGeneral" class="error-general">{{ errorGeneral }}</p>
             <p v-if="exito" class="exito">{{ exito }}</p>
 
@@ -116,13 +109,13 @@ const exito = ref('')
 const formVacio = () => ({
     id_usuario: '', id_conductor: '', id_vehiculo: '',
     origen: '', destino: '', estado: '',
-    monto_cobrado: '', fecha_solicitud: ''
+    monto_cobrado: ''
 })
 
 const erroresVacios = () => ({
     id_usuario: '', id_conductor: '', id_vehiculo: '',
     origen: '', destino: '', estado: '',
-    monto_cobrado: '', fecha_solicitud: ''
+    monto_cobrado: ''
 })
 
 const form = ref(formVacio())
@@ -151,7 +144,6 @@ const formularioValido = () => {
         errores.value.id_usuario   = validarRequerido(form.value.id_usuario, 'El pasajero')
         errores.value.id_conductor = validarRequerido(form.value.id_conductor, 'El conductor')
         errores.value.id_vehiculo  = validarRequerido(form.value.id_vehiculo, 'El vehiculo')
-        errores.value.fecha_solicitud = validarFecha(form.value.fecha_solicitud)
     }
     errores.value.estado         = validarRequerido(form.value.estado, 'El estado')
     errores.value.origen         = validarRequerido(form.value.origen, 'El origen')
