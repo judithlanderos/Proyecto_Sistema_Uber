@@ -319,139 +319,52 @@ router.put('/viajes/:id', verificarToken, (req, res) => {
     })
 })
 
-
-// ===================== PASAJERO =====================
-
-// Ver sus propios viajes
+// PASAJERO
 router.get('/pasajero/viajes', verificarToken, (req, res) => {
     const id = req.usuario.id
-
     const sql = `
-        SELECT v.id_viaje, v.origen, v.destino, v.estado, v.monto_cobrado,
-            v.fecha_salida, v.fecha_inicio, v.fecha_fin, v.distancia_km,
+        SELECT v.id_viaje, v.origen, v.destino, v.fecha_salida, v.estado, v.monto_cobrado,
             CONCAT(c.nombre, ' ', c.primer_ap) AS conductor,
-            c.calificacion_prom,
-            c.num_licencia,
-            ve.marca, ve.modelo, ve.anio, ve.placa, ve.categoria
+            c.num_licencia, c.calificacion_prom,
+            ve.placa, ve.marca, ve.modelo, ve.categoria
         FROM Viaje v
         JOIN Conductor c ON v.Conductor_id_conductor = c.id_conductor
         JOIN Vehiculo ve ON v.Vehiculo_id_vehiculo = ve.id_vehiculo
         WHERE v.Usuario_id_usuario = ?
         ORDER BY v.id_viaje DESC
     `
-
     db.query(sql, [id], (err, results) => {
         if (err) return res.status(500).json({ error: err.message })
         res.json(results)
     })
 })
 
-// Solicitar viaje
-router.post('/pasajero/viajes', verificarToken, (req, res) => {
-    const id_usuario = req.usuario.id
-
-    const { origen, destino, id_conductor, id_vehiculo } = req.body
-
-    if (!origen || !destino || !id_conductor || !id_vehiculo)
-        return res.status(400).json({ error: 'Faltan datos del viaje' })
-
-    const fecha = new Date().toISOString().slice(0, 19).replace('T', ' ')
-
-    const sql = `
-        INSERT INTO Viaje (
-            origen,
-            destino,
-            fecha_salida,
-            estado,
-            monto_cobrado,
-            distancia_km,
-            Usuario_id_usuario,
-            Conductor_id_conductor,
-            Vehiculo_id_vehiculo
-        )
-        VALUES (?, ?, ?, 'pendiente', 0, 0, ?, ?, ?)
-    `
-
-    db.query(
-        sql,
-        [origen, destino, fecha, id_usuario, id_conductor, id_vehiculo],
-        (err, result) => {
-            if (err) return res.status(500).json({ error: err.message })
-
-            res.status(201).json({
-                mensaje: 'Viaje solicitado correctamente',
-                id: result.insertId
-            })
-        }
-    )
-})
-
-// Cancelar viaje propio
-router.put('/pasajero/viajes/:id/cancelar', verificarToken, (req, res) => {
-    const id_usuario = req.usuario.id
-
-    const sql = `
-        UPDATE Viaje
-        SET estado = 'cancelado'
-        WHERE id_viaje = ?
-            AND Usuario_id_usuario = ?
-            AND estado = 'pendiente'
-    `
-
-    db.query(sql, [req.params.id, id_usuario], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message })
-
-        if (result.affectedRows === 0)
-            return res.status(400).json({
-                error: 'No se puede cancelar este viaje'
-            })
-
-        res.json({ mensaje: 'Viaje cancelado' })
-    })
-})
-
-// Ver sus pagos
 router.get('/pasajero/pagos', verificarToken, (req, res) => {
     const id = req.usuario.id
-
     const sql = `
-        SELECT p.id_pago, p.monto, p.fecha_pago, p.metodo,
+        SELECT p.id_pago, p.monto, p.fecha_transaccion,
+            m.tipo AS metodo_tipo,
             v.origen, v.destino
         FROM Pago p
         JOIN Viaje v ON p.Viaje_id_viaje = v.id_viaje
+        JOIN MetodoPago m ON p.MetodoPago_id_metodo = m.id_metodo
         WHERE v.Usuario_id_usuario = ?
-        ORDER BY p.fecha_pago DESC
+        ORDER BY p.id_pago DESC
     `
-
     db.query(sql, [id], (err, results) => {
         if (err) return res.status(500).json({ error: err.message })
         res.json(results)
     })
 })
 
-// Lista de conductores disponibles
-router.get('/pasajero/conductores', verificarToken, (req, res) => {
-    const sql = `
-        SELECT c.id_conductor,
-            CONCAT(c.nombre, ' ', c.primer_ap) AS nombre,
-            c.calificacion_prom,
-            c.num_licencia,
-            ve.id_vehiculo,
-            ve.marca,
-            ve.modelo,
-            ve.placa,
-            ve.categoria
-        FROM Conductor c
-        JOIN Vehiculo ve
-            ON ve.Conductor_id_conductor = c.id_conductor
-        ORDER BY c.calificacion_prom DESC
-    `
-
-    db.query(sql, (err, results) => {
+router.post('/pasajero/solicitar-viaje', verificarToken, (req, res) => {
+    const id = req.usuario.id
+    const { id_conductor, id_vehiculo, origen, destino, fecha_solicitud, monto_cobrado } = req.body
+    const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, fecha_salida, fecha_inicio, fecha_fin, distancia_km, estado, monto_cobrado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    db.query(sql, [id, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, fecha_solicitud, fecha_solicitud, 0.00, 'pendiente', monto_cobrado || 0], (err) => {
         if (err) return res.status(500).json({ error: err.message })
-        res.json(results)
+        res.status(201).json({ mensaje: 'Viaje solicitado correctamente' })
     })
 })
-
 
 module.exports = router
