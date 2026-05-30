@@ -44,7 +44,7 @@ const formatearFecha = (fecha) => {
     const [year, month, day] = datePart.split('-')
     const [hour, minute] = timePart.split(':')
     
-    return `${day}/${month}/${year} ${hour}:${minute}`
+    return `${day}/${month}/${year}`
 }
 const iniciarDataTable = () => {
     if (dtInstance) { dtInstance.destroy(); dtInstance = null }
@@ -53,7 +53,9 @@ const iniciarDataTable = () => {
         order: [[0, 'desc']],
         responsive: true,
         pageLength: 10,
-        lengthMenu: [5, 10, 25]
+        lengthMenu: [5, 10, 25],
+        destroy: true
+
     })
 }
 
@@ -61,9 +63,15 @@ const cargar = async () => {
     try {
         if (dtInstance) { dtInstance.destroy(); dtInstance = null }
         const res = await apiGet('/pasajero/pagos')
-        pagos.value = res.data
+        pagos.value = res.data.map(p => ({
+            ...p,
+            fecha_transaccion: p.fecha_transaccion ? p.fecha_transaccion.split('T')[0] : ''
+        }))
         await nextTick()
+        await nextTick()
+        setTimeout(() => {
         iniciarDataTable()
+    }, 200)
     } catch (err) { console.error('Error cargando pagos', err) }
 }
 
