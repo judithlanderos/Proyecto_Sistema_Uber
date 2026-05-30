@@ -93,7 +93,10 @@ const cargar = async () => {
     try {
         if (dtInstance) { dtInstance.destroy(); dtInstance = null }
         const res = await getPagos()
-        pagos.value = res.data
+        pagos.value = res.data.map(p => ({
+            ...p,
+            fecha_transaccion: p.fecha_transaccion ? String(p.fecha_transaccion).split('T')[0] : ''
+        }))
         await nextTick()
         iniciarDataTable()
     } catch (err) { console.error('Error cargando pagos', err) }

@@ -8,7 +8,7 @@
             <div class="campo" v-if="!modoEditar">
                 <label>Viaje (solo completados)</label>
                 <select v-model="form.id_viaje" @change="errores.id_viaje = validarSeleccion(form.id_viaje, 'un viaje')">
-                    <option value="">- Selecciona un viaje -</option>
+                    <option value=""> Selecciona un viaje </option>
                     <option v-for="v in viajes" :key="v.id_viaje" :value="v.id_viaje">
                         #{{ v.id_viaje }} — {{ v.origen }} → {{ v.destino }}
                     </option>
@@ -19,7 +19,7 @@
             <div class="campo">
                 <label>Metodo de Pago</label>
                 <select v-model="form.id_metodo" @change="errores.id_metodo = validarSeleccion(form.id_metodo, 'un metodo')">
-                    <option value="">- Selecciona metodo -</option>
+                    <option value="">Selecciona metodo </option>
                     <option v-for="m in metodos" :key="m.id_metodo" :value="m.id_metodo">
                         {{ m.tipo }}{{ m.detalle ? ' (' + m.detalle + ')' : '' }}
                     </option>
