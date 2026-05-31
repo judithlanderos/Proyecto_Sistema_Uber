@@ -164,7 +164,16 @@ const guardar = async () => {
             await updateViaje(props.viajeEditar.id_viaje, form.value)
             exito.value = 'Viaje actualizado correctamente'
         } else {
-            await createViaje(form.value)
+            await createViaje({
+                id_usuario: form.value.id_usuario,
+                id_conductor: form.value.id_conductor,
+                id_vehiculo: form.value.id_vehiculo,
+                origen: form.value.origen,
+                destino: form.value.destino,
+                estado: form.value.estado,
+                monto_cobrado: form.value.monto_cobrado,
+                distancia_km: null
+            })
             exito.value = 'Viaje agregado correctamente'
         }
         emit('guardado')
