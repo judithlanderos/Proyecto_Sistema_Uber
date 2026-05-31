@@ -43,7 +43,7 @@
             <div class="campo">
                 <label>Numero de Licencia</label>
                 <input v-model="form.num_licencia" type="text" placeholder="Numero de licencia"
-                    @input="errores.num_licencia = validarRequerido(form.num_licencia, 'Licencia')" />
+                    @input="errores.num_licencia = validarLicencia(form.num_licencia)"/>
                 <span class="error-campo" v-if="errores.num_licencia">{{ errores.num_licencia }}</span>
             </div>
 
@@ -103,7 +103,7 @@ const formularioValido = () => {
     errores.value.segundo_ap = validarApellido(form.value.segundo_ap, false)
     errores.value.correo = validarCorreo(form.value.correo)
     errores.value.telefono = validarTelefono(form.value.telefono)
-    errores.value.num_licencia = validarRequerido(form.value.num_licencia, 'Licencia')
+    errores.value.num_licencia = validarLicencia(form.value.num_licencia)
     return !Object.values(errores.value).some(e => e !== '')
 }
 
@@ -124,6 +124,12 @@ const guardar = async () => {
     } catch (err) {
         errorGeneral.value = err.response?.data?.error || 'Error al guardar'
     }
+}
+const validarLicencia = (valor) => {
+    const v = (valor ?? '').trim()
+    if (!v) return 'La licencia es obligatoria'
+    if (!/^[A-Z]{3}[-]?\d{3}$/.test(v)) return 'Formato inválido. Usa: LLL999 o LLL-999'
+    return ''
 }
 </script>
 

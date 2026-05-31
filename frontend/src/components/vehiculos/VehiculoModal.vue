@@ -60,7 +60,7 @@
             <div class="campo">
                 <label>Modelo</label>
                 <input v-model="form.modelo" type="text" placeholder="Versa"
-                    @input="errores.modelo = validarRequerido(form.modelo, 'El modelo')" />
+                   @input="errores.modelo = validarModelo(form.modelo)" />
                 <span class="error-campo" v-if="errores.modelo">{{ errores.modelo }}</span>
             </div>
 
@@ -153,6 +153,14 @@ const validarAnio = (valor) => {
     if (num < 1990 || num > new Date().getFullYear() + 1) return 'Año fuera de rango'
     return ''
 }
+const validarModelo = (valor) => {
+    const v = (valor ?? '').trim()
+    if (!v) return 'El modelo es obligatorio'
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ0-9\s]+$/.test(v)) return 'El modelo solo permite letras y números'
+    if (v.length < 2) return 'Mínimo 2 caracteres'
+    if (v.length > 50) return 'Máximo 50 caracteres'
+    return ''
+}
 
 const cargarConductores = async () => {
     try {
@@ -193,7 +201,7 @@ cargarConductores()
 const formularioValido = () => {
     errores.value.placa = validarPlaca(form.value.placa)
     errores.value.marca = validarNombre(form.value.marca)
-    errores.value.modelo = validarRequerido(form.value.modelo, 'El modelo')
+    errores.value.modelo = validarModelo(form.value.modelo)
     errores.value.anio = validarAnio(form.value.anio)
     errores.value.categoria = validarRequerido(form.value.categoria, 'La categoría')
     errores.value.id_conductor = validarRequerido(form.value.id_conductor, 'El conductor')
