@@ -311,9 +311,9 @@ router.delete('/calificaciones/:id', verificarToken, (req, res) => {
     })
 })
 router.put('/viajes/:id', verificarToken, (req, res) => {
-    const { origen, destino, estado, monto_cobrado, fecha_solicitud, fecha_inicio, fecha_fin, distancia_km } = req.body
-    const sql = 'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, fecha_salida = ?, fecha_inicio = ?, fecha_fin = ?, distancia_km = ? WHERE id_viaje = ?'
-    db.query(sql, [origen, destino, estado, monto_cobrado, fecha_solicitud, fecha_inicio, fecha_fin, distancia_km, req.params.id], (err) => {
+    const { origen, destino, estado, monto_cobrado, distancia_km } = req.body
+    const sql = 'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, distancia_km = ? WHERE id_viaje = ?'
+    db.query(sql, [origen, destino, estado, monto_cobrado, distancia_km || null, req.params.id], (err) => {
         if (err) return res.status(500).json({ error: err.message })
         res.json({ mensaje: 'Viaje actualizado correctamente' })
     })

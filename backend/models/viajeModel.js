@@ -23,7 +23,7 @@ const obtenerViajes = (callback) => {
 }
 
 const agregarViaje = (datos, callback) => {
-    const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, fecha_salida, estado, monto_cobrado, distancia_km) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, estado, monto_cobrado, distancia_km) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
     db.query(sql, datos, callback)
 }
 

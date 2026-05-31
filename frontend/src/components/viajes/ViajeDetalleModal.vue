@@ -69,12 +69,6 @@
                 <span class="error-campo" v-if="errores.monto_cobrado">{{ errores.monto_cobrado }}</span>
             </div>
 
-            <div class="campo" v-if="!modoEditar">
-                <label>Fecha Solicitud</label>
-                 <input v-model="form.fecha_solicitud" type="text" placeholder="2024-01-01" @input="actualizarFechas" />
-                <span class="error-campo" v-if="errores.fecha_solicitud">{{ errores.fecha_solicitud }}</span>
-            </div>
-
             <div class="campo">
                 <label>Distancia (km)</label>
                 <input v-model="form.distancia_km" type="text" placeholder="0.00" @input="validarCampo('distancia')" />
@@ -103,9 +97,9 @@
                 <div class="detalle-grid">
                     <div class="detalle-item"><span class="detalle-label">Origen</span><span class="detalle-valor">{{ detalle?.origen }}</span></div>
                     <div class="detalle-item"><span class="detalle-label">Destino</span><span class="detalle-valor">{{ detalle?.destino }}</span></div>
-                    <div class="detalle-item"><span class="detalle-label">Fecha Salida</span><span class="detalle-valor">{{ detalle?.fecha_salida }}</span></div>
-                    <div class="detalle-item"><span class="detalle-label">Fecha Fin</span><span class="detalle-valor">{{ detalle?.fecha_fin || 'Pendiente' }}</span></div>
-                    <div class="detalle-item"><span class="detalle-label">Distancia</span><span class="detalle-valor">{{ detalle?.distancia_km ? detalle.distancia_km + ' km' : '-' }}</span></div>
+                    <div class="detalle-item"><span class="detalle-label">Fecha Salida</span><span class="detalle-valor">{{ formatearFecha(detalle?.fecha_salida) }}</span></div>
+                    <div class="detalle-item"><span class="detalle-label">Fecha Fin</span><span class="detalle-valor">{{ detalle?.fecha_fin ? formatearFecha(detalle.fecha_fin) : 'Pendiente' }}</span></div>   
+                        <div class="detalle-item"><span class="detalle-label">Distancia</span><span class="detalle-valor">{{ detalle?.distancia_km ? detalle.distancia_km + ' km' : '-' }}</span></div>
                     <div class="detalle-item"><span class="detalle-label">Estado</span><span :class="['badge-estado', detalle?.estado]">{{ detalle?.estado }}</span></div>
                     <div class="detalle-item"><span class="detalle-label">Monto</span><span class="detalle-valor">{{ detalle?.monto_cobrado ? '$' + detalle.monto_cobrado : '—' }}</span></div>
                 </div>
@@ -153,6 +147,12 @@ import { postViaje, putViaje } from '../../services/viajeService'
 import { alertaExito, alertaError } from '../../utils/alertas'
 import { validarMonto, validarFecha, validarRequerido, validarDistancia, validarSeleccion, validarOrigen, validarDestino } from '../../utils/validaciones'
 
+const formatearFecha = (fecha) => {
+    if (!fecha) return '—'
+    const d = new Date(fecha)
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+        ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false })
+}
 const props = defineProps({
     tipo: String,
     modoEditar: Boolean,
@@ -170,14 +170,12 @@ const exito = ref('')
 
 const form = ref({
     id_usuario: '', id_conductor: '', id_vehiculo: '',
-    origen: '', destino: '', estado: '', monto_cobrado: '', fecha_solicitud: '',
-     fecha_inicio: '', fecha_fin: '', distancia_km: ''
+    origen: '', destino: '', estado: '', monto_cobrado: '', distancia_km: ''
 })
 
 const errores = ref({
     id_usuario: '', id_conductor: '', id_vehiculo: '',
-    origen: '', destino: '', estado: '', monto_cobrado: '', fecha_solicitud: '', 
-    fecha_inicio: '', fecha_fin: '', distancia_km: ''
+    origen: '', destino: '', estado: '', monto_cobrado: '', distancia_km: ''
 })
 
 watch(() => props.viajeEditar, (viaje) => {
@@ -187,31 +185,21 @@ watch(() => props.viajeEditar, (viaje) => {
             destino: viaje.destino || '',
             estado: viaje.estado || '',
             monto_cobrado: viaje.monto_cobrado || '',
-            fecha_solicitud: viaje.fecha_salida || '',
-            fecha_inicio: viaje.fecha_inicio || '',
-            fecha_fin: viaje.fecha_fin || '',
             distancia_km: viaje.distancia_km || ''
         }
     } else {
         form.value = { id_usuario: '', id_conductor: '', id_vehiculo: '', origen: '', destino: '',
-         estado: '', monto_cobrado: '', fecha_solicitud: '', fecha_inicio: '', fecha_fin: '',
-            distancia_km: '' }
-    }
+         estado: '', monto_cobrado: '', distancia_km: '' }
+    } 
+    errores.value = { id_usuario: '', id_conductor: '', id_vehiculo: '', origen: '', destino: '', estado: '', monto_cobrado: '', distancia_km: '' }
+    errorGeneral.value = ''
+    exito.value = ''
 }, { immediate: true })
-
-const actualizarFechas = () => {
-    if (form.value.fecha_solicitud) {
-        form.value.fecha_inicio = form.value.fecha_solicitud
-        form.value.fecha_fin = form.value.fecha_solicitud
-    }
-    validarCampo('fecha')
-}
 
 const validarCampo = (campo) => {
     if (campo === 'origen') errores.value.origen = validarOrigen(form.value.origen, 'El origen')
     if (campo === 'destino') errores.value.destino = validarDestino(form.value.destino, 'El destino')
     if (campo === 'monto') errores.value.monto_cobrado = validarMonto(form.value.monto_cobrado)
-    if (campo === 'fecha') errores.value.fecha_solicitud = validarFecha(form.value.fecha_solicitud)
     if (campo === 'distancia') errores.value.distancia_km = form.value.distancia_km ? validarDistancia(form.value.distancia_km) : ''
 }
 
@@ -242,20 +230,24 @@ const guardar = async () => {
         }
     }
     const payload = {
-        ...form.value,
+        origen: form.value.origen,
+        destino: form.value.destino,
+        estado: form.value.estado,
+        monto_cobrado: form.value.monto_cobrado,
         distancia_km: form.value.distancia_km !== '' ? form.value.distancia_km : null
     }
-
-    console.log('PAYLOAD QUE SE MANDA:', payload)
-    console.log('distancia_km:', payload.distancia_km) 
-
 
     try {
         if (props.modoEditar) {
             await putViaje(props.viajeEditar.id_viaje, payload)
             alertaExito('Viaje actualizado correctamente')
         } else {
-            await postViaje(form.value)
+            await postViaje({
+                id_usuario: form.value.id_usuario,
+                id_conductor: form.value.id_conductor,
+                id_vehiculo: form.value.id_vehiculo,
+                ...payload
+            })
             alertaExito('Viaje agregado correctamente')
         }
         emit('guardado')

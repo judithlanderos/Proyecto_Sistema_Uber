@@ -5,11 +5,10 @@ const listarViajes = (callback) => {
 }
 
 const crearViaje = (datos, callback) => {
-    const { id_usuario, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, estado, monto_cobrado, distancia_km  } = datos
-    viajeModel.agregarViaje(
-            [id_usuario, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, estado, monto_cobrado, distancia_km || null],
-            callback
-        )
+    const { id_usuario, id_conductor, id_vehiculo, origen, destino, estado, monto_cobrado, distancia_km } = datos
+    const arr = [id_usuario, id_conductor, id_vehiculo, origen, destino, estado, monto_cobrado, distancia_km || null]
+    console.log('ARRAY VIAJE:', arr, 'LENGTH:', arr.length)
+    viajeModel.agregarViaje(arr, callback)
 }
 
 const actualizarViaje = (id, datos, callback) => {

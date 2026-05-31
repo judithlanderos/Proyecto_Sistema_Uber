@@ -117,10 +117,7 @@ const cargarViajes = async () => {
     try {
         if (dtInstance) { dtInstance.destroy(); dtInstance = null }
         const res = await getViajes()
-        viajes.value = res.data.map(v => ({
-            ...v,
-            fecha_salida: v.fecha_salida ? String(v.fecha_salida).split('T')[0] : ''
-        }))
+        viajes.value = res.data
         await nextTick()
         iniciarDataTable()
     } catch (err) {
