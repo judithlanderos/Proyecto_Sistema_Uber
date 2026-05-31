@@ -17,12 +17,15 @@ const obtenerPagos = (callback) => {
 }
 const crearPago = (datos, callback) => {
     const { id_viaje, monto, id_metodo } = datos
-    db.query('SELECT id_metodo FROM MetodoPago WHERE tipo = ? LIMIT 1', [id_metodo], (err, results) => {
+    db.query('SELECT id_pago FROM Pago WHERE Viaje_id_viaje = ?', [id_viaje], (err, results) => {
         if (err) return callback(err)
-        if (results.length === 0) return callback(new Error('Método de pago no encontrado'))
-        const id_metodo_real = results[0].id_metodo
-        db.query('INSERT INTO Pago (Viaje_id_viaje, monto, MetodoPago_id_metodo) VALUES (?, ?, ?)',
-            [id_viaje, monto, id_metodo_real], callback)
+        if (results.length > 0) return callback(new Error('Este viaje ya tiene un pago registrado'))
+        db.query('SELECT id_metodo FROM MetodoPago WHERE tipo = ? LIMIT 1', [id_metodo], (err, results) => {
+            if (err) return callback(err)
+            if (results.length === 0) return callback(new Error('Método de pago no encontrado'))
+            db.query('INSERT INTO Pago (Viaje_id_viaje, monto, MetodoPago_id_metodo) VALUES (?, ?, ?)',
+                [id_viaje, monto, results[0].id_metodo], callback)
+        })
     })
 }
 
