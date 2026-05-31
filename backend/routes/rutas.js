@@ -268,8 +268,6 @@ router.get('/pagos/lista', verificarToken, (req, res) => {
     })
 })
 router.post('/pagos/crear', verificarToken, (req, res) => {
-    console.log(req.body)
-
         pagoModel.crearPago(req.body, (err) => {
             if (err) return res.status(500).json({ error: err.message })
             res.status(201).json({ mensaje: 'Pago creado correctamente' })
