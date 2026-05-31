@@ -74,7 +74,7 @@
             <div class="campo">
                 <label>Categoría</label>
                 <select v-model="form.categoria" @change="errores.categoria = validarRequerido(form.categoria, 'La categoría')">
-                    <option value="">-- Selecciona --</option>
+                    <option value="">Selecciona</option>
                     <option value="UberX">UberX</option>
                     <option value="Comfort">Comfort</option>
                     <option value="UberXL">UberXL</option>
@@ -87,7 +87,7 @@
                 <label>Conductor</label>
                 <select v-model="form.id_conductor"
                     @change="errores.id_conductor = validarRequerido(form.id_conductor, 'El conductor')">
-                    <option value="">-- Selecciona --</option>
+                    <option value="">Selecciona</option>
                     <option v-for="c in conductores" :key="c.id_conductor" :value="c.id_conductor">
                         {{ c.nombre }} {{ c.primer_ap }}
                     </option>
