@@ -15,9 +15,9 @@ const obtenerCalificaciones = (callback) => {
 }
 
 const crearCalificacion = (datos, callback) => {
-    const { id_viaje, direccion, puntaje, comentario, fecha_calificacion } = datos
-    db.query('INSERT INTO Calificacion (Viaje_id_viaje, direccion, puntaje, comentario, fecha_calificacion) VALUES (?, ?, ?, ?, ?)',
-        [id_viaje, direccion, puntaje, comentario, fecha_calificacion], callback)
+    const { id_viaje, direccion, puntaje, comentario } = datos
+    db.query('INSERT INTO Calificacion (Viaje_id_viaje, direccion, puntaje, comentario) VALUES (?, ?, ?, ?)',
+        [id_viaje, direccion, puntaje, comentario], callback)
 }
 
 const editarCalificacion = (id, datos, callback) => {

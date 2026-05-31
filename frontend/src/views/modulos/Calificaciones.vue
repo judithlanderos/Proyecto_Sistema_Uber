@@ -40,7 +40,7 @@
                             </span>
                         </td>
                         <td>{{ cal.comentario || '—' }}</td>
-                        <td>{{ cal.fecha_calificacion }}</td>
+                        <td>{{ formatearFecha(cal.fecha_calificacion) }}</td>
                         <td>
                             <button class="btn-accion editar btn-editar" :data-id="cal.id_calificacion">
                                 <i class="fas fa-edit"></i>
@@ -82,13 +82,6 @@
                     <span class="error-campo" v-if="errores.direccion">{{ errores.direccion }}</span>
                 </div>
 
-                <div class="campo" v-if="!modoEditar">
-                    <label>Fecha</label>
-                    <input v-model="form.fecha_calificacion" type="text" placeholder="2024-01-01"
-                        @input="errores.fecha_calificacion = validarFecha(form.fecha_calificacion)"
-                        @blur="errores.fecha_calificacion = validarFecha(form.fecha_calificacion)" />
-                    <span class="error-campo" v-if="errores.fecha_calificacion">{{ errores.fecha_calificacion }}</span>
-                </div>
 
                 <div class="campo">
                     <label>Puntaje</label>
@@ -138,12 +131,12 @@ const calificacionSeleccionada = ref(null)
 
 const form = ref({
     id_viaje: '', direccion: '', puntaje: 0,
-    comentario: '', fecha_calificacion: ''
+    comentario: ''
 })
 
 const errores = ref({
     id_viaje: '', direccion: '', puntaje: '',
-    comentario: '', fecha_calificacion: ''
+    comentario: ''
 })
 
 // ── Validación comentario ─────────────────────────────────────
@@ -160,11 +153,16 @@ const formularioValido = () => {
     if (!modoEditar.value) {
         errores.value.id_viaje           = validarSeleccion(form.value.id_viaje, 'un viaje')
         errores.value.direccion          = validarSeleccion(form.value.direccion, 'una dirección')
-        errores.value.fecha_calificacion = validarFecha(form.value.fecha_calificacion)
     }
     errores.value.puntaje    = form.value.puntaje < 1 ? 'Selecciona un puntaje.' : ''
     errores.value.comentario = validarComentario(form.value.comentario)
     return !Object.values(errores.value).some(e => e !== '')
+}
+const formatearFecha = (fecha) => {
+    if (!fecha) return '—'
+    const d = new Date(fecha)
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+        ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
 // ── DataTable ─────────────────────────────────────────────────
@@ -260,7 +258,6 @@ const guardar = async () => {
                 direccion:           form.value.direccion,
                 puntaje:             form.value.puntaje,
                 comentario:          form.value.comentario,
-                fecha_calificacion:  form.value.fecha_calificacion
             })
             alertaExito('Calificación agregada correctamente')
         }
