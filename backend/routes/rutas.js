@@ -380,4 +380,16 @@ router.post('/pasajero/solicitar-viaje', verificarToken, (req, res) => {
     })
 })
 
+router.get('/calificaciones/viaje/:id/conductor-a-usuario', verificarToken, (req, res) => {
+    db.query(
+        `SELECT puntaje, comentario, fecha_calificacion FROM Calificacion 
+         WHERE Viaje_id_viaje = ? AND direccion = 'conductor_a_usuario'`,
+        [req.params.id], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message })
+            if (results.length === 0) return res.json(null)
+            res.json(results[0])
+        }
+    )
+})
+
 module.exports = router
