@@ -15,12 +15,15 @@ const obtenerPagos = (callback) => {
     `
     db.query(sql, callback)
 }
-
 const crearPago = (datos, callback) => {
     const { id_viaje, monto, id_metodo } = datos
-    console.log(id_viaje, monto, id_metodo)
-    db.query('INSERT INTO Pago (Viaje_id_viaje, monto, MetodoPago_id_metodo) VALUES (?, ?, ?)',
-        [id_viaje, monto, id_metodo], callback)
+    db.query(
+        `INSERT INTO Pago (Viaje_id_viaje, monto, MetodoPago_id_metodo)
+         SELECT ?, ?, m.id_metodo FROM MetodoPago m
+         JOIN Viaje v ON m.id_usuario = v.Usuario_id_usuario
+         WHERE v.id_viaje = ? AND m.tipo = ? LIMIT 1`,
+        [id_viaje, monto, id_viaje, id_metodo], callback
+    )
 }
 
 const editarPago = (id, datos, callback) => {
@@ -40,7 +43,7 @@ const obtenerViajesCompletados = (callback) => {
 }
 
 const obtenerMetodosPago = (callback) => {
-    db.query('SELECT id_metodo, tipo, detalle FROM MetodoPago WHERE id_usuario = ? AND activo = 1', [id_usuario], callback)
+    db.query("SELECT DISTINCT tipo AS id_metodo, tipo FROM MetodoPago GROUP BY tipo", callback)
 }
 
 module.exports = { obtenerPagos, crearPago, editarPago, eliminarPago, eliminarPorViaje, obtenerViajesCompletados, obtenerMetodosPago }

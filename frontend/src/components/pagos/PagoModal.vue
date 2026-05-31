@@ -20,7 +20,7 @@
                 <label>Metodo de Pago</label>
                 <select v-model="form.id_metodo" @change="errores.id_metodo = validarSeleccion(form.id_metodo, 'un metodo')">
                     <option value="">Selecciona metodo </option>
-                    <option v-for="m in metodos" :key="m.id_metodo" :value="m.tipo">
+                    <option v-for="m in metodos" :key="m.id_metodo" :value="m.id_metodo">
                         {{ m.tipo }}
                     </option>
                 </select>
