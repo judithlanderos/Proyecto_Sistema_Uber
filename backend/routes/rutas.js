@@ -11,7 +11,10 @@ const vehiculoModel = require('../models/vehiculoModel')
 const pagoModel = require('../models/pagoModel')
 const calificacionModel = require('../models/calificacionModel')
 const viajeModel = require('../models/viajeModel')
-
+router.use((req, res, next) => {
+    console.log('ROUTER HIT:', req.method, req.path)
+    next()
+})
 
 const {
     registro, login, logout,
@@ -312,11 +315,22 @@ router.delete('/calificaciones/:id', verificarToken, (req, res) => {
 })
 router.put('/viajes/:id', verificarToken, (req, res) => {
     const { origen, destino, estado, monto_cobrado, distancia_km } = req.body
-    const sql = 'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, distancia_km = ? WHERE id_viaje = ?'
-    db.query(sql, [origen, destino, estado, monto_cobrado, distancia_km || null, req.params.id], (err) => {
-        if (err) return res.status(500).json({ error: err.message })
-        res.json({ mensaje: 'Viaje actualizado correctamente' })
-    })
+    console.log('PUT VIAJES EJECUTADO, estado:', estado, 'id:', req.params.id)
+
+    if (estado === 'completado') {
+        const fecha_fin = new Date().toISOString().slice(0, 19).replace('T', ' ')
+        const sql = 'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, distancia_km = ?, fecha_fin = ? WHERE id_viaje = ?'
+        db.query(sql, [origen, destino, estado, monto_cobrado, distancia_km || null, fecha_fin, req.params.id], (err) => {
+            if (err) return res.status(500).json({ error: err.message })
+            res.json({ mensaje: 'Viaje actualizado correctamente' })
+        })
+    } else {
+        const sql = 'UPDATE Viaje SET origen = ?, destino = ?, estado = ?, monto_cobrado = ?, distancia_km = ? WHERE id_viaje = ?'
+        db.query(sql, [origen, destino, estado, monto_cobrado, distancia_km || null, req.params.id], (err) => {
+            if (err) return res.status(500).json({ error: err.message })
+            res.json({ mensaje: 'Viaje actualizado correctamente' })
+        })
+    }
 })
 
 // PASAJERO

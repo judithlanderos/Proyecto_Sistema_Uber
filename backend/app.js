@@ -11,7 +11,10 @@ const app = express();
 
 const path = require('path')
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
-
+app.use('/api', (req, res, next) => {
+    console.log('REQUEST:', req.method, req.path)
+    next()
+})
 app.use(helmet({
     noSniff: true,
     xssFilter: true,

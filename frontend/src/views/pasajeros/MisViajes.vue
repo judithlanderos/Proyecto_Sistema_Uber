@@ -26,7 +26,7 @@
                         <td>{{ v.placa }} — {{ v.marca }} {{ v.modelo }}<br><small style="color:#a0a0a0;">{{ v.categoria }}</small></td>
                         <td><span :class="['badge-estado', v.estado]">{{ v.estado }}</span></td>
                         <td>{{ v.monto_cobrado ? '$' + v.monto_cobrado : '—' }}</td>
-                        <td>{{ v.fecha_salida }}</td>
+                        <td>{{formatearFecha(v.fecha_salida) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -37,6 +37,13 @@
 <script setup>
 import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import { apiGet } from '../../api/index'
+
+const formatearFecha = (fecha) => {
+    if (!fecha) return '—'
+    const d = new Date(fecha)
+    return d.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+        ' ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', hour12: false })
+}
 
 const tablaRef = ref(null)
 let dtInstance = null

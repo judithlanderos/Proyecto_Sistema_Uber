@@ -153,6 +153,7 @@ const abrirEditar = (viaje) => {
 const abrirDetalle = async (id) => {
     try {
         const res = await getViajeDetalle(id)
+        console.log('fecha_fin recibida:', res.data.fecha_fin)
         detalle.value = res.data
         tipoModal.value = 'detalle'
         modalVisible.value = true
