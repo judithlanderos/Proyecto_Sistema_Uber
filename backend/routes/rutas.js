@@ -295,10 +295,47 @@ router.get('/calificaciones/lista', verificarToken, (req, res) => {
     })
 })
 router.post('/calificaciones/crear', verificarToken, (req, res) => {
-        calificacionModel.crearCalificacion(req.body, (err) => {
-            if (err) return res.status(500).json({ error: err.message })
-            res.status(201).json({ mensaje: 'Calificacion creada correctamente' })
-        })
+    calificacionModel.crearCalificacion(req.body, (err) => {
+        if (err) return res.status(500).json({ error: err.message })
+
+        if (req.body.direccion === 'usuario_a_conductor') {
+            const sql = `
+                UPDATE Conductor c
+                JOIN Viaje v ON v.id_viaje = ?
+                SET c.calificacion_prom = (
+                    SELECT AVG(cal.puntaje)
+                    FROM Calificacion cal
+                    JOIN Viaje vi ON vi.id_viaje = cal.Viaje_id_viaje
+                    WHERE vi.Conductor_id_conductor = v.Conductor_id_conductor
+                    AND cal.direccion = 'usuario_a_conductor'
+                )
+                WHERE c.id_conductor = v.Conductor_id_conductor
+            `
+            db.query(sql, [req.body.id_viaje], (err2) => {
+                if (err2) console.error('Error actualizando promedio conductor:', err2.message)
+            })
+        }
+
+        if (req.body.direccion === 'conductor_a_usuario') {
+            const sql = `
+                UPDATE Usuario u
+                JOIN Viaje v ON v.id_viaje = ?
+                SET u.calificacion_prom = (
+                    SELECT AVG(cal.puntaje)
+                    FROM Calificacion cal
+                    JOIN Viaje vi ON vi.id_viaje = cal.Viaje_id_viaje
+                    WHERE vi.Usuario_id_usuario = v.Usuario_id_usuario
+                    AND cal.direccion = 'conductor_a_usuario'
+                )
+                WHERE u.id_usuario = v.Usuario_id_usuario
+            `
+            db.query(sql, [req.body.id_viaje], (err2) => {
+                if (err2) console.error('Error actualizando promedio usuario:', err2.message)
+            })
+        }
+
+        res.status(201).json({ mensaje: 'Calificacion creada correctamente' })
+    })
 })
 router.put('/calificaciones/:id', verificarToken, (req, res) => {
     calificacionModel.editarCalificacion(req.params.id, req.body, (err) => {

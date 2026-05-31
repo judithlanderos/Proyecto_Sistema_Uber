@@ -55,6 +55,7 @@ const cargar = async () => {
     } catch (err) { console.error('Error cargando pagos', err) }
 }
 
+
 const iniciarDataTable = () => {
     if (dtInstance) { dtInstance.destroy(); dtInstance = null }
     dtInstance = window.$(tablaRef.value).DataTable({
