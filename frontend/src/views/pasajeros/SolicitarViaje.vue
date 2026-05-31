@@ -26,13 +26,13 @@
 
             <div class="campo">
                 <label>Origen</label>
-                <input v-model="form.origen" type="text" placeholder="Direccion de origen" @input="errores.origen = validarRequerido(form.origen, 'El origen')" />
+                <input v-model="form.origen" type="text" placeholder="Direccion de origen"@input="errores.origen = validarOrigen(form.origen)" />
                 <span class="error-campo" v-if="errores.origen">{{ errores.origen }}</span>
             </div>
 
             <div class="campo">
                 <label>Destino</label>
-                <input v-model="form.destino" type="text" placeholder="Direccion de destino" @input="errores.destino = validarRequerido(form.destino, 'El destino')" />
+                <input v-model="form.destino" type="text" placeholder="Direccion de destino" @input="errores.destino = validarDestino(form.destino, 'El destino')" />
                 <span class="error-campo" v-if="errores.destino">{{ errores.destino }}</span>
             </div>
 
@@ -52,7 +52,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { apiGet, apiPost } from '../../api/index'
-import { validarRequerido, validarFecha, validarMonto } from '../../utils/validaciones'
+import { validarRequerido, validarFecha, validarMonto, validarOrigen, validarDestino } from '../../utils/validaciones'
 import { alertaExito, alertaError } from '../../utils/alertas'
 
 const conductores = ref([])
@@ -83,6 +83,8 @@ const formularioValido = () => {
     errores.value.id_vehiculo = validarRequerido(form.value.id_vehiculo, 'El vehiculo')
     errores.value.origen = validarRequerido(form.value.origen, 'El origen')
     errores.value.destino = validarRequerido(form.value.destino, 'El destino')
+    errores.value.origen = validarOrigen(form.value.origen) 
+    errores.value.destino = validarDestino(form.value.destino)
     errores.value.monto_cobrado = validarMonto(form.value.monto_cobrado)
     return !Object.values(errores.value).some(e => e !== '')
 }
