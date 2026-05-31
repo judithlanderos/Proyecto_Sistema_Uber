@@ -17,7 +17,7 @@
                 <label>Vehiculo</label>
                 <select v-model="form.id_vehiculo" @change="errores.id_vehiculo = validarRequerido(form.id_vehiculo, 'El vehiculo')">
                     <option value="">Selecciona vehiculo</option>
-                    <option v-for="v in vehiculos" :key="v.id_vehiculo" :value="v.id_vehiculo">
+                    <option v-for="v in vehiculosFiltrados" :key="v.id_vehiculo" :value="v.id_vehiculo">
                         {{ v.placa }} — {{ v.marca }} {{ v.modelo }} 
                     </option>
                 </select>
@@ -37,12 +37,6 @@
             </div>
 
             <div class="campo">
-                <label>Fecha Solicitud</label>
-                <input v-model="form.fecha_solicitud" type="text" placeholder="2026-01-01" @input="errores.fecha_solicitud = validarFecha(form.fecha_solicitud)" />
-                <span class="error-campo" v-if="errores.fecha_solicitud">{{ errores.fecha_solicitud }}</span>
-            </div>
-
-            <div class="campo">
                 <label>Monto Estimado (opcional)</label>
                 <input v-model="form.monto_cobrado" type="text" placeholder="0.00" @input="errores.monto_cobrado = validarMonto(form.monto_cobrado)" />
                 <span class="error-campo" v-if="errores.monto_cobrado">{{ errores.monto_cobrado }}</span>
@@ -56,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { apiGet, apiPost } from '../../api/index'
 import { validarRequerido, validarFecha, validarMonto } from '../../utils/validaciones'
 import { alertaExito, alertaError } from '../../utils/alertas'
@@ -66,11 +60,11 @@ const vehiculos = ref([])
 const cargando = ref(false)
 
 const form = ref({
-    id_conductor: '', id_vehiculo: '', origen: '', destino: '', fecha_solicitud: '', monto_cobrado: ''
+    id_conductor: '', id_vehiculo: '', origen: '', destino: '', monto_cobrado: ''
 })
 
 const errores = ref({
-    id_conductor: '', id_vehiculo: '', origen: '', destino: '', fecha_solicitud: '', monto_cobrado: ''
+    id_conductor: '', id_vehiculo: '', origen: '', destino: '', monto_cobrado: ''
 })
 
 const cargarDesplegables = async () => {
@@ -89,7 +83,6 @@ const formularioValido = () => {
     errores.value.id_vehiculo = validarRequerido(form.value.id_vehiculo, 'El vehiculo')
     errores.value.origen = validarRequerido(form.value.origen, 'El origen')
     errores.value.destino = validarRequerido(form.value.destino, 'El destino')
-    errores.value.fecha_solicitud = validarFecha(form.value.fecha_solicitud)
     errores.value.monto_cobrado = validarMonto(form.value.monto_cobrado)
     return !Object.values(errores.value).some(e => e !== '')
 }
@@ -100,14 +93,23 @@ const solicitar = async () => {
     try {
         await apiPost('/pasajero/solicitar-viaje', form.value)
         alertaExito('Viaje solicitado correctamente')
-        form.value = { id_conductor: '', id_vehiculo: '', origen: '', destino: '', fecha_solicitud: '', monto_cobrado: '' }
-        errores.value = { id_conductor: '', id_vehiculo: '', origen: '', destino: '', fecha_solicitud: '', monto_cobrado: '' }
+        form.value = { id_conductor: '', id_vehiculo: '', origen: '', destino: '', monto_cobrado: '' }
+        errores.value = { id_conductor: '', id_vehiculo: '', origen: '', destino: '', monto_cobrado: '' }
     } catch (err) {
         alertaError(err.response?.data?.error || 'Error al solicitar viaje')
     } finally {
         cargando.value = false
     }
 }
+
+const vehiculosFiltrados = computed(() => {
+    if (!form.value.id_conductor) return []
+    return vehiculos.value.filter(v => v.id_conductor === form.value.id_conductor && v.activo)
+})
+
+watch(() => form.value.id_conductor, () => {
+    form.value.id_vehiculo = ''
+})
 
 onMounted(cargarDesplegables)
 </script>

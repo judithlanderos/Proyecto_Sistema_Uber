@@ -32,10 +32,11 @@
                             <button v-if="v.estado === 'completado'" class="btn-accion btn-calificar" :data-id="v.id_viaje">
                                 <i class="fas fa-star"></i>
                             </button>
+                            <button v-if="v.estado === 'completado'" class="btn-accion btn-ver-cal" :data-id="v.id_viaje">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </td>
-                        <button v-if="v.estado === 'completado'" class="btn-accion btn-ver-cal" :data-id="v.id_viaje">
-                            <i class="fas fa-eye"></i>
-                        </button>
+            
                     </tr>
                 </tbody>
             </table>
