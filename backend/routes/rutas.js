@@ -369,12 +369,11 @@ router.get('/pasajero/pagos', verificarToken, (req, res) => {
         res.json(results)
     })
 })
-
 router.post('/pasajero/solicitar-viaje', verificarToken, (req, res) => {
     const id = req.usuario.id
-    const { id_conductor, id_vehiculo, origen, destino, fecha_solicitud, monto_cobrado } = req.body
-    const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, fecha_salida, fecha_inicio, fecha_fin, distancia_km, estado, monto_cobrado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-    db.query(sql, [id, id_conductor, id_vehiculo, origen, destino, fecha_solicitud, fecha_solicitud, fecha_solicitud, 0.00, 'pendiente', monto_cobrado || 0], (err) => {
+    const { id_conductor, id_vehiculo, origen, destino, monto_cobrado } = req.body
+    const sql = 'INSERT INTO Viaje (Usuario_id_usuario, Conductor_id_conductor, Vehiculo_id_vehiculo, origen, destino, distancia_km, estado, monto_cobrado) VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+    db.query(sql, [id, id_conductor, id_vehiculo, origen, destino, 0.00, 'pendiente', monto_cobrado || 0], (err) => {
         if (err) return res.status(500).json({ error: err.message })
         res.status(201).json({ mensaje: 'Viaje solicitado correctamente' })
     })
