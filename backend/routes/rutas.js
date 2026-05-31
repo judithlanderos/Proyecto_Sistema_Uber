@@ -273,10 +273,12 @@ router.post('/pagos/crear', verificarToken, (req, res) => {
             res.status(201).json({ mensaje: 'Pago creado correctamente' })
         })
 })
+
 router.put('/pagos/:id', verificarToken, (req, res) => {
-        pagoModel.editarPago(req.params.id, req.body, (err) => {
-            res.json({ mensaje: 'Pago actualizado correctamente' })
-        })
+    pagoModel.editarPago(req.params.id, req.body, (err) => {
+        if (err) return res.status(500).json({ error: err.message })
+        res.json({ mensaje: 'Pago actualizado correctamente' })
+    })
 })
 router.delete('/pagos/:id', verificarToken, (req, res) => {
     pagoModel.eliminarPago(req.params.id, (err) => {
