@@ -38,18 +38,6 @@ const tablaRef = ref(null)
 let dtInstance = null
 const pagos = ref([])
 
-const iniciarDataTable = () => {
-    if (dtInstance) { dtInstance.destroy(); dtInstance = null }
-    dtInstance = window.$(tablaRef.value).DataTable({
-        language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
-        order: [[0, 'desc']],
-        responsive: true,
-        pageLength: 10,
-        lengthMenu: [5, 10, 25],
-        destroy: true
-
-    })
-}
 
 const cargar = async () => {
     try {
@@ -65,6 +53,19 @@ const cargar = async () => {
         iniciarDataTable()
     }, 200)
     } catch (err) { console.error('Error cargando pagos', err) }
+}
+
+const iniciarDataTable = () => {
+    if (dtInstance) { dtInstance.destroy(); dtInstance = null }
+    dtInstance = window.$(tablaRef.value).DataTable({
+        language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/es-ES.json' },
+        order: [[0, 'desc']],
+        responsive: true,
+        pageLength: 10,
+        lengthMenu: [5, 10, 25],
+        destroy: true
+
+    })
 }
 
 onMounted(cargar)
