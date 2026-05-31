@@ -103,7 +103,7 @@
 
                     <div class="campo">
                         <select v-model="nuevoMetodo.tipo"  @change="confirmarMetodo">
-                            <option value="">- Selecciona método -</option>
+                            <option value="">Selecciona método</option>
                             <option value="efectivo">Efectivo</option>
                             <option value="tarjeta">Tarjeta</option>
                             <option value="saldo_uber">Saldo Uber</option>

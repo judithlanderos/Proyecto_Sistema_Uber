@@ -36,11 +36,11 @@ const eliminarPorViaje = (id_viaje, callback) => {
     db.query('DELETE FROM Pago WHERE Viaje_id_viaje = ?', [id_viaje], callback)
 }
 const obtenerViajesCompletados = (callback) => {
-    db.query(`SELECT id_viaje, origen, destino FROM Viaje WHERE estado = 'completado'`, callback)
+    db.query(`SELECT v.id_viaje, v.origen, v.destino, v.Usuario_id_usuario AS id_usuario FROM Viaje WHERE estado = 'completado'`, callback)
 }
 
 const obtenerMetodosPago = (callback) => {
-    db.query('SELECT m.id_metodo, m.tipo, m.detalle, CONCAT(u.nombre, " ", u.primer_ap) AS usuario FROM MetodoPago m JOIN Usuario u ON m.id_usuario = u.id_usuario', callback)
+    db.query('SELECT id_metodo, tipo, detalle FROM MetodoPago WHERE id_usuario = ? AND activo = 1', [id_usuario], callback)
 }
 
 module.exports = { obtenerPagos, crearPago, editarPago, eliminarPago, eliminarPorViaje, obtenerViajesCompletados, obtenerMetodosPago }

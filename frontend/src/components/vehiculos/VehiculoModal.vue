@@ -46,7 +46,7 @@
             <div class="campo">
                 <label>Placa</label>
                 <input v-model="form.placa" type="text" placeholder="ABC123"
-                    @input="errores.placa = validarRequerido(form.placa, 'La placa')" />
+                    @input="errores.placa = validarPlaca(form.placa)" />
                 <span class="error-campo" v-if="errores.placa">{{ errores.placa }}</span>
             </div>
 
@@ -162,7 +162,11 @@ const cargarConductores = async () => {
         conductores.value = []
     }
 }
-
+const validarPlaca = (valor) => {
+    if (!valor) return 'La placa es obligatoria'
+    if (!/^[A-Z]{3}[0-9]{3}$/.test(valor)) return 'La placa debe tener el formato ABC123'
+    return ''
+}
 watch(() => props.vehiculo, (v) => {
     if (v) {
         modoEditar.value = true
@@ -187,7 +191,7 @@ watch(() => props.vehiculo, (v) => {
 cargarConductores()
 
 const formularioValido = () => {
-    errores.value.placa = validarRequerido(form.value.placa, 'La placa')
+    errores.value.placa = validarPlaca(form.value.placa)
     errores.value.marca = validarNombre(form.value.marca)
     errores.value.modelo = validarRequerido(form.value.modelo, 'El modelo')
     errores.value.anio = validarAnio(form.value.anio)

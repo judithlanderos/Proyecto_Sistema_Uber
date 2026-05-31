@@ -258,7 +258,9 @@ router.get('/pagos/viajes-completados', verificarToken, (req, res) => {
 })
 
 router.get('/pagos/metodos', verificarToken, (req, res) => {
-    pagoModel.obtenerMetodosPago((err, results) => {
+    const { id_usuario } = req.query
+    if (!id_usuario) return res.status(400).json({ error: 'id_usuario requerido' })
+    pagoModel.obtenerMetodosPago(id_usuario, (err, results) => {
         if (err) return res.status(500).json({ error: err.message })
         res.json(results)
     })
