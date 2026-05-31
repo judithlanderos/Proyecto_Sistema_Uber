@@ -35,6 +35,9 @@
                             <button v-if="v.estado === 'completado'" class="btn-accion btn-ver-cal" :data-id="v.id_viaje">
                                 <i class="fas fa-eye"></i>
                             </button>
+                            <button v-if="v.estado === 'pendiente'" class="btn-accion btn-eliminar" :data-id="v.id_viaje">
+                                <i class="fas fa-times"></i>
+                            </button>
                         </td>
             
                     </tr>
@@ -104,7 +107,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue'
-import { apiGet, apiPost } from '../../api/index'
+import { apiGet, apiPost, apiPut } from '../../api/index'
 import { alertaExito, alertaError, alertaConfirmar } from '../../utils/alertas'
 
 const modalVisible = ref(false)
@@ -177,8 +180,29 @@ const iniciarDataTable = () => {
     const id = Number(window.$(this).data('id'))
     verCalificacion(id)
 })
+window.$(tablaRef.value).on('click', '.btn-eliminar', function () {
+    const id = Number(window.$(this).data('id'))
+    eliminar(id)
+})
 }
-
+const eliminar = async (id) => {
+    const resultado = await alertaConfirmar('¿Seguro que deseas cancelar este viaje?')
+    if (!resultado.isConfirmed) return
+    try {
+        const viaje = viajes.value.find(v => v.id_viaje === id)
+        await apiPut(`/viajes/${id}`, {
+            origen: viaje.origen,
+            destino: viaje.destino,
+            estado: 'cancelado',
+            monto_cobrado: viaje.monto_cobrado || '',
+            distancia_km: viaje.distancia_km || null
+        })
+        await cargar()
+        alertaExito('Viaje cancelado correctamente')
+    } catch {
+        alertaError('Error al cancelar viaje')
+    }
+}
 const cargar = async () => {
     try {
         if (dtInstance) { dtInstance.destroy(); dtInstance = null }
@@ -238,4 +262,5 @@ onBeforeUnmount(() => { if (dtInstance) { dtInstance.destroy(); dtInstance = nul
 .btn-ver-cal { background-color: #14532d; color: #4ade80; }
 .detalle-item { display: flex; flex-direction: column; gap: 4px; }
 .detalle-label { color: #a0a0a0; font-size: 12px; text-transform: uppercase; }
+.btn-eliminar { background-color: #7f1d1d; color: #fca5a5; }
 </style>
