@@ -71,7 +71,7 @@ const obtenerConductores = (callback) => {
 }
 
 const obtenerVehiculos = (callback) => {
-    db.query('SELECT id_vehiculo, placa, marca, modelo FROM Vehiculo', callback)
+    db.query('SELECT id_vehiculo, placa, marca, modelo,  id_conductor, activo FROM Vehiculo', callback)
 }
 
 const obtenerConteos = (callback) => {

@@ -32,7 +32,7 @@
                 <label>Vehiculo</label>
                 <select v-model="form.id_vehiculo">
                     <option value="">Selecciona un vehiculo</option>
-                    <option v-for="v in vehiculos" :key="v.id_vehiculo" :value="v.id_vehiculo">
+                    <option v-for="v in vehiculosFiltrados" :key="v.id_vehiculo" :value="v.id_vehiculo">
                         {{ v.placa }} — {{ v.marca }} {{ v.modelo }}
                     </option>
                 </select>
@@ -142,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { postViaje, putViaje } from '../../services/viajeService'
 import { alertaExito, alertaError } from '../../utils/alertas'
 import { validarMonto, validarFecha, validarRequerido, validarDistancia, validarSeleccion, validarOrigen, validarDestino } from '../../utils/validaciones'
@@ -176,6 +176,10 @@ const form = ref({
 const errores = ref({
     id_usuario: '', id_conductor: '', id_vehiculo: '',
     origen: '', destino: '', estado: '', monto_cobrado: '', distancia_km: ''
+})
+const vehiculosFiltrados = computed(() => {
+    if (!form.value.id_conductor) return []
+    return props.vehiculos.filter(v => v.id_conductor === form.value.id_conductor && v.activo)
 })
 
 watch(() => props.viajeEditar, (viaje) => {
@@ -256,6 +260,10 @@ const guardar = async () => {
         alertaError(err.response?.data?.error || 'Error al guardar')
     }
 }
+watch(() => form.value.id_conductor, () => {
+    form.value.id_vehiculo = ''
+})
+
 </script>
 
 <style scoped>
