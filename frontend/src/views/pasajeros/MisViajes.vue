@@ -17,7 +17,7 @@
                 </thead>
                 <tbody>
                     <tr v-if="viajes.length === 0">
-                        <td colspan="8" style="text-align:center; color:#a0a0a0;">Sin viajes registrados</td>
+                        <td colspan="9" style="text-align:center; color:#a0a0a0;">Sin viajes registrados</td>
                     </tr>
                     <tr v-for="v in viajes" :key="v.id_viaje">
                         <td>{{ v.id_viaje }}</td>
