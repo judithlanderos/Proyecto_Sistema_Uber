@@ -15,15 +15,12 @@ const obtenerPagos = (callback) => {
     `
     db.query(sql, callback)
 }
+
 const crearPago = (datos, callback) => {
     const { id_viaje, monto, id_metodo } = datos
-    db.query(
-        `INSERT INTO Pago (Viaje_id_viaje, monto, MetodoPago_id_metodo)
-         SELECT ?, ?, m.id_metodo FROM MetodoPago m
-         JOIN Viaje v ON m.id_usuario = v.Usuario_id_usuario
-         WHERE v.id_viaje = ? AND m.tipo = ? LIMIT 1`,
-        [id_viaje, monto, id_viaje, id_metodo], callback
-    )
+    console.log(id_viaje, monto, id_metodo)
+    db.query('INSERT INTO Pago (Viaje_id_viaje, monto, MetodoPago_id_metodo) VALUES (?, ?, ?)',
+        [id_viaje, monto, id_metodo], callback)
 }
 
 const editarPago = (id, datos, callback) => {
@@ -39,11 +36,11 @@ const eliminarPorViaje = (id_viaje, callback) => {
     db.query('DELETE FROM Pago WHERE Viaje_id_viaje = ?', [id_viaje], callback)
 }
 const obtenerViajesCompletados = (callback) => {
-    db.query(`SELECT v.id_viaje, v.origen, v.destino, v.Usuario_id_usuario AS id_usuario FROM Viaje WHERE estado = 'completado'`, callback)
+    db.query(`SELECT id_viaje, origen, destino FROM Viaje WHERE estado = 'completado'`, callback)
 }
 
 const obtenerMetodosPago = (callback) => {
-    db.query("SELECT DISTINCT tipo AS id_metodo, tipo FROM MetodoPago GROUP BY tipo", callback)
+    db.query('SELECT m.id_metodo, m.tipo, m.detalle, CONCAT(u.nombre, " ", u.primer_ap) AS usuario FROM MetodoPago m JOIN Usuario u ON m.id_usuario = u.id_usuario', callback)
 }
 
 module.exports = { obtenerPagos, crearPago, editarPago, eliminarPago, eliminarPorViaje, obtenerViajesCompletados, obtenerMetodosPago }

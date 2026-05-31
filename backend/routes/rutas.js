@@ -11,10 +11,7 @@ const vehiculoModel = require('../models/vehiculoModel')
 const pagoModel = require('../models/pagoModel')
 const calificacionModel = require('../models/calificacionModel')
 const viajeModel = require('../models/viajeModel')
-router.use((req, res, next) => {
-    console.log('ROUTER HIT:', req.method, req.path)
-    next()
-})
+
 
 const {
     registro, login, logout,
@@ -258,9 +255,7 @@ router.get('/pagos/viajes-completados', verificarToken, (req, res) => {
 })
 
 router.get('/pagos/metodos', verificarToken, (req, res) => {
-    const { id_usuario } = req.query
-    if (!id_usuario) return res.status(400).json({ error: 'id_usuario requerido' })
-    pagoModel.obtenerMetodosPago(id_usuario, (err, results) => {
+    pagoModel.obtenerMetodosPago((err, results) => {
         if (err) return res.status(500).json({ error: err.message })
         res.json(results)
     })
@@ -317,7 +312,7 @@ router.delete('/calificaciones/:id', verificarToken, (req, res) => {
 })
 router.put('/viajes/:id', verificarToken, (req, res) => {
     const { origen, destino, estado, monto_cobrado, distancia_km } = req.body
-    console.log('PUT VIAJES EJECUTADO, estado:', estado, 'id:', req.params.id)
+        console.log('PUT VIAJES EJECUTADO, estado:', estado, 'id:', req.params.id)
 
     if (estado === 'completado') {
         const fecha_fin = new Date().toISOString().slice(0, 19).replace('T', ' ')

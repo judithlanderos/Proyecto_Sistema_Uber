@@ -21,7 +21,7 @@
                 <select v-model="form.id_metodo" @change="errores.id_metodo = validarSeleccion(form.id_metodo, 'un metodo')">
                     <option value="">Selecciona metodo </option>
                     <option v-for="m in metodos" :key="m.id_metodo" :value="m.id_metodo">
-                        {{ m.tipo }}
+                        {{ m.tipo }}{{ m.detalle ? ' (' + m.detalle + ')' : '' }}
                     </option>
                 </select>
                 <span class="error-campo" v-if="errores.id_metodo">{{ errores.id_metodo }}</span>
@@ -60,23 +60,15 @@ const metodos = ref([])
 
 const form = ref({ id_viaje: '', id_metodo: '', monto: ''})
 const errores = ref({ id_viaje: '', id_metodo: '', monto: '' })
+
 const cargarDesplegables = async () => {
     try {
-        const v = await getViajesCompletados()
+        const [v, m] = await Promise.all([getViajesCompletados(), getMetodosPago()])
         viajes.value = v.data
-        metodos.value = []
-    } catch { viajes.value = [] }
+        metodos.value = m.data
+    } catch { viajes.value = []; metodos.value = [] }
 }
 
-watch(() => form.value.id_viaje, async (id_viaje) => {
-    if (!id_viaje) { metodos.value = []; return }
-    const viaje = viajes.value.find(v => v.id_viaje === id_viaje)
-    if (!viaje) return
-    try {
-        const m = await getMetodosPago(viaje.id_usuario)
-        metodos.value = m.data
-    } catch { metodos.value = [] }
-})
 // Normaliza la fecha que viene del backend (puede traer hora: "2026-04-01T06:00:00.000Z")
 const normalizarFecha = (fecha) => {
     if (!fecha) return ''
