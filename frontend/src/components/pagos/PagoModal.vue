@@ -19,10 +19,10 @@
             <div class="campo">
                 <label>Metodo de Pago</label>
                 <select v-model="form.id_metodo" @change="errores.id_metodo = validarSeleccion(form.id_metodo, 'un metodo')">
-                    <option value="">Selecciona metodo </option>
-                    <option v-for="m in metodos" :key="m.id_metodo" :value="m.id_metodo">
-                        {{ m.tipo }}{{ m.detalle ? ' (' + m.detalle + ')' : '' }}
-                    </option>
+                    <option value="">Selecciona metodo</option>
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta">Tarjeta</option>
+                    <option value="saldo_uber">Saldo Uber</option>
                 </select>
                 <span class="error-campo" v-if="errores.id_metodo">{{ errores.id_metodo }}</span>
             </div>

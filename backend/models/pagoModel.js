@@ -15,12 +15,15 @@ const obtenerPagos = (callback) => {
     `
     db.query(sql, callback)
 }
-
 const crearPago = (datos, callback) => {
     const { id_viaje, monto, id_metodo } = datos
-    console.log(id_viaje, monto, id_metodo)
-    db.query('INSERT INTO Pago (Viaje_id_viaje, monto, MetodoPago_id_metodo) VALUES (?, ?, ?)',
-        [id_viaje, monto, id_metodo], callback)
+    db.query('SELECT id_metodo FROM MetodoPago WHERE tipo = ? LIMIT 1', [id_metodo], (err, results) => {
+        if (err) return callback(err)
+        if (results.length === 0) return callback(new Error('Método de pago no encontrado'))
+        const id_metodo_real = results[0].id_metodo
+        db.query('INSERT INTO Pago (Viaje_id_viaje, monto, MetodoPago_id_metodo) VALUES (?, ?, ?)',
+            [id_viaje, monto, id_metodo_real], callback)
+    })
 }
 
 const editarPago = (id, datos, callback) => {
