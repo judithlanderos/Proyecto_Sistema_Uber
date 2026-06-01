@@ -11,7 +11,7 @@ export const validarNombre = (valor) => {
     const v = (valor ?? '').trim()
     if (!valor) return 'El nombre es obligatorio'
     if (!soloLetras.test(valor)) return 'Solo se permiten letras'
-    if (valor.length < 2) return 'Minimo 2 caracteres'
+    if (valor.length < 3) return 'Minimo 3 caracteres'
     if (v.length > 50) return 'El nombre no puede exceder 50 caracteres.'
     return ''
 }
@@ -20,7 +20,7 @@ export const validarApellido = (valor, obligatorio = true) => {
     const v = (valor ?? '').trim()
     if (!valor && obligatorio) return 'El apellido es obligatorio'
     if (valor && !soloLetras.test(valor)) return 'Solo se permiten letras'
-    if (v.length < 2) return 'El apellido debe tener al menos 2 caracteres.'
+    if (v.length < 3) return 'El apellido debe tener al menos 3 caracteres.'
     if (v.length > 50) return 'El apellido no puede exceder 50 caracteres.'
     return ''
 }
